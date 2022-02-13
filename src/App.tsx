@@ -1,11 +1,12 @@
 import React from 'react';
+import SearchPage from './components/pages/searchPage';
 
-function App() {
+const App: React.FunctionComponent = ({ }) => {
   return (
     <div>
-      hello
+      <SearchPage />
     </div>
-  );
+  )
 }
 
 export default App;
