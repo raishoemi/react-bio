@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Popover, Button } from 'antd';
-import 'antd/dist/antd.css';
 
 const Header: React.FC = () => {
     const classes = useStyles();
-    const [disclaimerVisible, setDisclaimerVisible] = useState<boolean>(false);
+
     return (
         <div className={classes.container}>
             <div>
@@ -13,13 +12,8 @@ const Header: React.FC = () => {
             </div>
             <div className={classes.uniprotDisclaimerContainer}>
                 <img className={classes.uniprotImage} src='https://www.uniprot.org/images/logos/Logo_medium.png' />
-                <Popover placement='bottom' visible={disclaimerVisible}
-                    onVisibleChange={(visibility: boolean) => setDisclaimerVisible(visibility)}
-                    content={(
-                        <a onClick={() => setDisclaimerVisible(previousValue => !previousValue)}>
-                            All content is retrieved from uniprot's API, and not owned by this website
-                        </a>
-                    )}>
+                <Popover placement='bottom'
+                    content={(<p>All content is retrieved from uniprot's API, and not owned by this website</p>)}>
                     <Button type='ghost'>DISCLAIMER</Button>
                 </Popover>
             </div>
