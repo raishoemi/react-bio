@@ -1,7 +1,8 @@
 import React from 'react';
-import 'antd/dist/antd.dark.css';
+import 'antd/dist/antd.css';
 import { createUseStyles } from 'react-jss';
 import { Button, Popover } from 'antd';
+import SearchPage from './components/pages/searchPage';
 
 
 const App: React.FunctionComponent = ({ }) => {
@@ -11,9 +12,13 @@ const App: React.FunctionComponent = ({ }) => {
       <div className={classes.logo}>
         <img className={classes.logoImage} src='https://p7.hiclipart.com/preview/451/428/959/ikea-logo-sign-brand-business-business.jpg' />
       </div>
-      <div className={classes.page}></div>
-      <div className={classes.uniprotDisclaimerContainer}>
-        <img className={classes.uniprotDisclaimerImage} src='https://www.uniprot.org/images/logos/Logo_medium.png' />
+      <div className={classes.page}>
+        <SearchPage />
+      </div>
+      <div className={classes.uniprotDisclaimerContainer} style={{ 'backgroundImage': 'https://www.uniprot.org/images/UniProt_Headerimage.png' }}>
+        <div className={classes.uniprotDislcaimerImageContainer}>
+          <img className={classes.uniprotDisclaimerImage} src='https://www.uniprot.org/images/logos/Logo_medium.png' />
+        </div>
         <Popover placement='bottom'
           content={(<p>All content is retrieved from uniprot's API, and not owned by this website</p>)}>
           <Button className={classes.uniprotDisclaimerButton} type='ghost'>DISCLAIMER</Button>
@@ -38,9 +43,8 @@ const useStyles = createUseStyles({
     width: '70%'
   },
   page: {
-    backgroundColor: 'blue',
     width: '80vw',
-    height: '100vh',
+    marginTop: '5%',
   },
   uniprotDisclaimerContainer: {
     display: 'flex',
@@ -48,13 +52,20 @@ const useStyles = createUseStyles({
     width: '10vw',
     height: '10vw',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+  },
+  uniprotDislcaimerImageContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '30%',
+    backgroundImage: 'url("https://www.uniprot.org/images/UniProt_Headerimage.png")'
   },
   uniprotDisclaimerImage: {
-    width: '60%'
+    width: '80%'
   },
   uniprotDisclaimerButton: {
-    marginTop: '10%'
+    marginTop: '10%',
   }
 });
 
