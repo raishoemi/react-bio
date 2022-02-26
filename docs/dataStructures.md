@@ -11,6 +11,7 @@ I know this will end up as typescript objects anyway, but it's easier for me to 
 |name|{scientific: string, common: string}|false||
 |rank|string|true||
 |lineage|string[]|false||
+|parentId|number|true||
 |proteomeId|number|true||
 
 ## Protein
