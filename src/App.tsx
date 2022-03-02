@@ -3,6 +3,8 @@ import 'antd/dist/antd.css';
 import { createUseStyles } from 'react-jss';
 import { Button, Popover } from 'antd';
 import SearchPage from './components/pages/searchPage';
+import { Route, Routes } from 'react-router-dom';
+import TaxonomyPage from './components/pages/taxonomyPage';
 
 
 const App: React.FunctionComponent = ({ }) => {
@@ -13,7 +15,10 @@ const App: React.FunctionComponent = ({ }) => {
         <img className={classes.logoImage} src='https://p7.hiclipart.com/preview/451/428/959/ikea-logo-sign-brand-business-business.jpg' />
       </div>
       <div className={classes.page}>
-        <SearchPage />
+        <Routes>
+          <Route path='/' element={<SearchPage />} />
+          <Route path='taxonomy/:id' element={<TaxonomyPage />} />
+        </Routes>
       </div>
       <div className={classes.uniprotDisclaimerContainer} style={{ 'backgroundImage': 'https://www.uniprot.org/images/UniProt_Headerimage.png' }}>
         <div className={classes.uniprotDislcaimerImageContainer}>

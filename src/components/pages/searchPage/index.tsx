@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Card, Pagination, Select } from 'antd';
+import Meta from 'antd/lib/card/Meta';
 import { createUseStyles } from 'react-jss';
 import { getTaxonomyResultsAmount, queryTaxonomies } from '../../../api';
 import { Protein, Entity, Taxonomy } from '../../../types';
 import { Category, ProteinCategory, SearchResults, TaxonomyCategory } from './types';
 import SearchBox from './searchBox';
-import TaxonomyPage from '../taxonomyPage';
-import Meta from 'antd/lib/card/Meta';
+import { useNavigate } from 'react-router-dom';
 
 
 const PAGE_SIZE = 6;
@@ -18,6 +18,7 @@ const categories: Category[] = [
 
 const SearchPage: React.FunctionComponent<{}> = () => {
     const classes = useStyles();
+    const navigate = useNavigate();
     const [chosenCategory, setChosenCategory] = useState<Category>(categories[0]);
     const [searchResults, setSearchResults] = useState<SearchResults>();
     const [currentPageItems, setCurrentPageItems] = useState<Entity[]>([]);
@@ -36,9 +37,8 @@ const SearchPage: React.FunctionComponent<{}> = () => {
         setCurrentPageItems(taxonomies);
     };
 
-    const onSelected = (id: number) => {
-        console.log(`Selected ${id}`);
-        // Route to the selected item
+    function navigateToItemPage(itemId: number) {
+        navigate(`/${chosenCategory.name.toLowerCase()}/${itemId}`);
     }
 
     const handlePageChange = (page: number, pageSize: number) => {
@@ -67,14 +67,15 @@ const SearchPage: React.FunctionComponent<{}> = () => {
                     ))}
                 </Select>
                 <div style={{ flex: 0.01 }}></div>
-                <SearchBox style={{ flex: 0.3 }} onSearch={onSearch} example={chosenCategory.example} queryFunction={chosenCategory.getEntities} onSelected={onSelected} />
+                <SearchBox style={{ flex: 0.3 }} onSearch={onSearch} example={chosenCategory.example} queryFunction={chosenCategory.getEntities} onSelected={navigateToItemPage} />
                 <div style={{ flex: 0.02 }}></div>
                 <Button type='dashed'>Random</Button>
             </div>
             <div className={classes.searchResultItemsContainer}>
                 {searchResults && (searchResults.category instanceof TaxonomyCategory ?
                     (currentPageItems as Taxonomy[]).map((taxonomy: Taxonomy) => (
-                        <Card hoverable className={classes.searchResultItem} onClick={() => { console.log('clicked') }}>
+                        <Card key={taxonomy.id} id={taxonomy.id.toString()} hoverable className={classes.searchResultItem}
+                            onClick={() => { navigateToItemPage(taxonomy.id) }}>
                             <Meta style={{ marginTop: '-2%' }} title={taxonomy.name} description={taxonomy.lineage.join(' / ')} />
                         </Card>
                     ))
@@ -115,7 +116,11 @@ const useStyles = createUseStyles({
         width: '60%',
         marginTop: '1%',
         height: `${(100 / PAGE_SIZE) - 3}%`,
-        border: '1px solid #1890ff54'
+        border: '1px solid #1890ff54',
+        transition: '150ms ease-out',
+        '&:hover': {
+            border: '3px solid #1890ff54',
+        }
     },
     pages: {
         marginTop: '1%'
