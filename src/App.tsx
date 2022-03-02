@@ -44,7 +44,7 @@ const useStyles = createUseStyles({
   },
   page: {
     width: '80vw',
-    marginTop: '5%',
+    height: '100vh'
   },
   uniprotDisclaimerContainer: {
     display: 'flex',

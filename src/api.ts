@@ -1,6 +1,6 @@
-import { Taxonomy } from './models';
+import { Taxonomy } from './types';
 
-export async function queryTaxonomies(query: string, limit: number=20, offset: number=0): Promise<Taxonomy[]> {
+export async function queryTaxonomies(query: string, limit: number = 20, offset: number = 0): Promise<Taxonomy[]> {
     const response = await fetch(`https://www.uniprot.org/taxonomy/?query=${query}&sort=score&format=tab&limit=${limit}&offset=${offset}`);
     const responseText = await response.text();
     let lines = responseText.split('\n');
@@ -8,20 +8,25 @@ export async function queryTaxonomies(query: string, limit: number=20, offset: n
     lines.pop(); // Last line is empty string
     return lines.map(line => {
         const values = line.split('\t');
-        return {
-            id: parseInt(values[0]),
-            mnemonic: values[1],
-            name: {
-                common: values[3],
-                scientific: values[2]
-            },
-            rank: values[7],
-            lineage: values[8].split(';'),
-            parentId: parseInt(values[9])
-        }
+        return new Taxonomy(parseInt(values[0]), values[1], values[2], values[3],
+            values[7], values[8].split(';'), parseInt(values[9]));
     })
 }
 
-export async function queryProteins(query: string, limit: number=20, offset: number=0): Promise<Taxonomy[]> {
+export async function getTaxonomyResultsAmount(query: string): Promise<number> {
+    const CHUNKS_SIZE = 50000;
+    let total = 0;
+    let currentChinkSize = CHUNKS_SIZE; // First chunk size, to enter the while loop
+    let chunksAmount = 0;
+    while (currentChinkSize === CHUNKS_SIZE) {
+        const response = await fetch(`https://www.uniprot.org/taxonomy/?query=${query}&sort=score&format=list&limit=${CHUNKS_SIZE}&offset=${chunksAmount * CHUNKS_SIZE}`);
+        currentChinkSize = (await response.text()).split('\n').length;
+        chunksAmount += 1;
+        total += currentChinkSize;
+    }
+    return total;
+}
+
+export async function queryProteins(query: string, limit: number = 20, offset: number = 0): Promise<Taxonomy[]> {
     return [];
 }

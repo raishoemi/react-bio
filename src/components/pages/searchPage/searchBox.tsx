@@ -1,22 +1,22 @@
 import { AutoComplete, Input } from 'antd';
 import React, { useState } from 'react';
-import { QueryResult } from './types';
+import { Entity } from '../../../types';
 
 
 type SearchBoxProps = {
-    placeholder: string;
-    queryFunction: (query: string) => Promise<QueryResult[]>;
-    onSearch: (query: string) => void;
+    example: string;
+    queryFunction: (query: string) => Promise<Entity[]>;
+    onSearch: (query: string) => Promise<void>;
     onSelected: (id: number) => void;
     style: object;
 }
 
 const SearchBox: React.FunctionComponent<SearchBoxProps> = (props: SearchBoxProps) => {
-    const [options, setOptions] = useState<QueryResult[]>([])
+    const [options, setOptions] = useState<{ label: string, value: number }[]>([])
 
     const handleInputChanged = (query: string) => {
-        props.queryFunction(query).then(results => {
-            setOptions(results.slice(0, 4));
+        props.queryFunction(query).then((results: Entity[]) => {
+            setOptions(results.slice(0, 4).map((result: Entity) => { return { label: result.name, value: result.id } }));
         })
     };
 
@@ -32,7 +32,7 @@ const SearchBox: React.FunctionComponent<SearchBoxProps> = (props: SearchBoxProp
             onSearch={handleInputChanged}
             style={props.style}
         >
-            <Input.Search placeholder={props.placeholder} enterButton onSearch={handleSearch} />
+            <Input.Search placeholder={`E.g. ${props.example}`} enterButton onSearch={handleSearch} />
         </AutoComplete>
     );
 };
