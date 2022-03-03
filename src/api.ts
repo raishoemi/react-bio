@@ -9,6 +9,13 @@ export async function queryTaxonomies(query: string, limit: number = 20, offset:
     return lines.map(parseTaxonomyResponse);
 }
 
+export async function getTaxonomy(id: number): Promise<Taxonomy> {
+    const response = await fetch(`https://www.uniprot.org/taxonomy/?query=${id}&format=tab`);
+    const responseText = await response.text();
+    const taxonomyString = responseText.split('\n')[1];
+    return parseTaxonomyResponse(taxonomyString);
+}
+
 export async function getRandomTaxonomyId(): Promise<number> {
     const response = await fetch('https://www.uniprot.org/taxonomy/?random=yes');
     return parseInt(response.url.split('/').slice(-1)[0]);
