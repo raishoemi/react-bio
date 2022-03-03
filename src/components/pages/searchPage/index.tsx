@@ -80,7 +80,7 @@ const SearchPage: React.FunctionComponent<{}> = () => {
                     (currentPageItems as Taxonomy[]).map((taxonomy: Taxonomy) => {
                         const lineage = taxonomy.lineage.join(' / ');
                         return (
-                            <Card key={taxonomy.id} id={taxonomy.id.toString()} hoverable className={classes.searchResultItem}
+                            <Card key={taxonomy.id} hoverable className={classes.searchResultItem}
                                 onClick={() => { navigateToItemPage(taxonomy.id) }}>
                                 <Typography.Paragraph ellipsis={{ tooltip: lineage, rows: 2 }} type='secondary'>
                                     <Typography.Text strong>{taxonomy.name} &#183; </Typography.Text>
@@ -94,8 +94,8 @@ const SearchPage: React.FunctionComponent<{}> = () => {
                         <Card />
                     ))
                 )}
-                <Pagination className={classes.pages} showSizeChanger={false} defaultCurrent={1} defaultPageSize={PAGE_SIZE} hideOnSinglePage responsive total={searchResults?.totalItems} onChange={handlePageChange} />
             </div>
+            <Pagination className={classes.pages} showSizeChanger={false} defaultCurrent={1} defaultPageSize={PAGE_SIZE} hideOnSinglePage responsive total={searchResults?.totalItems} onChange={handlePageChange} />
         </div>
     );
 }
@@ -121,10 +121,12 @@ const useStyles = createUseStyles({
         height: '90%',
         flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        flexBasis: 0,
+        flexGrow: 1
     },
     searchResultItem: {
         width: '60%',
-        marginTop: '1%',
         height: `${(100 / PAGE_SIZE) - 3}%`,
         border: '1px solid #1890ff54',
         transition: '150ms ease-out',
