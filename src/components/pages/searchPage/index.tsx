@@ -37,6 +37,11 @@ const SearchPage: React.FunctionComponent<{}> = () => {
         setCurrentPageItems(taxonomies);
     };
 
+    async function onRandomItem(): Promise<void> {
+        const randomItemId = await chosenCategory.getRandomId();
+        navigateToItemPage(randomItemId);
+    }
+
     function navigateToItemPage(itemId: number) {
         navigate(`/${chosenCategory.name.toLowerCase()}/${itemId}`);
     }
@@ -47,7 +52,6 @@ const SearchPage: React.FunctionComponent<{}> = () => {
             setCurrentPageItems(searchResults.pages[page]);
         } else {
             queryTaxonomies(searchResults.query, pageSize, (page - 1) * PAGE_SIZE).then(taxonomies => {
-                // searchResults.pages[page] = taxonomies;
                 setCurrentPageItems(taxonomies);
             });
         }
@@ -69,7 +73,7 @@ const SearchPage: React.FunctionComponent<{}> = () => {
                 <div style={{ flex: 0.01 }}></div>
                 <SearchBox style={{ flex: 0.3 }} onSearch={onSearch} example={chosenCategory.example} queryFunction={chosenCategory.getEntities} onSelected={navigateToItemPage} />
                 <div style={{ flex: 0.02 }}></div>
-                <Button type='dashed'>Random</Button>
+                <Button type='dashed' onClick={onRandomItem}>Random</Button>
             </div>
             <div className={classes.searchResultItemsContainer}>
                 {searchResults && (searchResults.category instanceof TaxonomyCategory ?

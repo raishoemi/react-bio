@@ -6,11 +6,12 @@ export async function queryTaxonomies(query: string, limit: number = 20, offset:
     let lines = responseText.split('\n');
     lines.shift(); // First line is header
     lines.pop(); // Last line is empty string
-    return lines.map(line => {
-        const values = line.split('\t');
-        return new Taxonomy(parseInt(values[0]), values[1], values[2], values[3],
-            values[7], values[8].split(';'), parseInt(values[9]));
-    })
+    return lines.map(parseTaxonomyResponse);
+}
+
+export async function getRandomTaxonomyId(): Promise<number> {
+    const response = await fetch('https://www.uniprot.org/taxonomy/?random=yes');
+    return parseInt(response.url.split('/').slice(-1)[0]);
 }
 
 export async function getTaxonomyResultsAmount(query: string): Promise<number> {
@@ -29,4 +30,10 @@ export async function getTaxonomyResultsAmount(query: string): Promise<number> {
 
 export async function queryProteins(query: string, limit: number = 20, offset: number = 0): Promise<Taxonomy[]> {
     return [];
+}
+
+function parseTaxonomyResponse(response: string): Taxonomy {
+    const values = response.split('\t');
+    return new Taxonomy(parseInt(values[0]), values[1], values[2], values[3],
+        values[7], values[8].split(';'), parseInt(values[9]));
 }

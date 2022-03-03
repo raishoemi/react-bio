@@ -1,4 +1,4 @@
-import { queryTaxonomies } from "../../../api";
+import { getRandomTaxonomyId, queryTaxonomies } from "../../../api";
 import { Entity, Protein, Taxonomy } from "../../../types"
 
 abstract class Category {
@@ -8,6 +8,7 @@ abstract class Category {
     ) { }
 
     public abstract getEntities(query: string, limit?: number, offset?: number): Promise<Entity[]>;
+    public abstract getRandomId(): Promise<number>;
 }
 
 class TaxonomyCategory extends Category {
@@ -18,6 +19,10 @@ class TaxonomyCategory extends Category {
     public async getEntities(query: string, limit?: number, offset?: number): Promise<Taxonomy[]> {
         return queryTaxonomies(query, limit, offset);
     }
+
+    public getRandomId(): Promise<number> {
+        return getRandomTaxonomyId();
+    }
 }
 
 class ProteinCategory extends Category {
@@ -26,6 +31,10 @@ class ProteinCategory extends Category {
     }
 
     public getEntities(query: string, limit?: number, offset?: number): Promise<Protein[]> {
+        throw new Error("Method not implemented.");
+    }
+
+    public getRandomId(): Promise<number> {
         throw new Error("Method not implemented.");
     }
 }
