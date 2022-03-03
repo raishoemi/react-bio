@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Pagination, Select } from 'antd';
+import { Button, Card, Pagination, Select, Typography } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import { createUseStyles } from 'react-jss';
 import { getTaxonomyResultsAmount, queryTaxonomies } from '../../../api';
@@ -77,12 +77,18 @@ const SearchPage: React.FunctionComponent<{}> = () => {
             </div>
             <div className={classes.searchResultItemsContainer}>
                 {searchResults && (searchResults.category instanceof TaxonomyCategory ?
-                    (currentPageItems as Taxonomy[]).map((taxonomy: Taxonomy) => (
-                        <Card key={taxonomy.id} id={taxonomy.id.toString()} hoverable className={classes.searchResultItem}
-                            onClick={() => { navigateToItemPage(taxonomy.id) }}>
-                            <Meta style={{ marginTop: '-2%' }} title={taxonomy.name} description={taxonomy.lineage.join(' / ')} />
-                        </Card>
-                    ))
+                    (currentPageItems as Taxonomy[]).map((taxonomy: Taxonomy) => {
+                        const lineage = taxonomy.lineage.join(' / ');
+                        return (
+                            <Card key={taxonomy.id} id={taxonomy.id.toString()} hoverable className={classes.searchResultItem}
+                                onClick={() => { navigateToItemPage(taxonomy.id) }}>
+                                <Typography.Text ellipsis={{ tooltip: lineage }} type='secondary'>
+                                    <Typography.Text strong>{taxonomy.name} &#183; </Typography.Text>
+                                    {lineage}
+                                </Typography.Text>
+                            </Card>
+                        );
+                    })
                     :
                     (currentPageItems as Protein[]).map((protein: Protein) => (
                         <Card />
