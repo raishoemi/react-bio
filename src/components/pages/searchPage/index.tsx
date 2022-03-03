@@ -82,10 +82,10 @@ const SearchPage: React.FunctionComponent<{}> = () => {
                         return (
                             <Card key={taxonomy.id} id={taxonomy.id.toString()} hoverable className={classes.searchResultItem}
                                 onClick={() => { navigateToItemPage(taxonomy.id) }}>
-                                <Typography.Text ellipsis={{ tooltip: lineage }} type='secondary'>
+                                <Typography.Paragraph ellipsis={{ tooltip: lineage, rows: 2 }} type='secondary'>
                                     <Typography.Text strong>{taxonomy.name} &#183; </Typography.Text>
                                     {lineage}
-                                </Typography.Text>
+                                </Typography.Paragraph>
                             </Card>
                         );
                     })
@@ -127,7 +127,6 @@ const useStyles = createUseStyles({
         marginTop: '1%',
         height: `${(100 / PAGE_SIZE) - 3}%`,
         border: '1px solid #1890ff54',
-        overflow: 'hidden',
         transition: '150ms ease-out',
         '&:hover': {
             border: '3px solid #1890ff54',
