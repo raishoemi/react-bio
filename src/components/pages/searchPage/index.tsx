@@ -121,6 +121,7 @@ const useStyles = createUseStyles({
         marginTop: '1%',
         height: `${(100 / PAGE_SIZE) - 3}%`,
         border: '1px solid #1890ff54',
+        overflow: 'hidden',
         transition: '150ms ease-out',
         '&:hover': {
             border: '3px solid #1890ff54',
