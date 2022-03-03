@@ -88,8 +88,8 @@ const SearchPage: React.FunctionComponent<{}> = () => {
                         <Card />
                     ))
                 )}
+                <Pagination className={classes.pages} showSizeChanger={false} defaultCurrent={1} defaultPageSize={PAGE_SIZE} hideOnSinglePage responsive total={searchResults?.totalItems} onChange={handlePageChange} />
             </div>
-            <Pagination showSizeChanger={false} className={classes.pages} defaultCurrent={1} defaultPageSize={PAGE_SIZE} hideOnSinglePage responsive total={searchResults?.totalItems} onChange={handlePageChange} />
         </div>
     );
 }
@@ -112,7 +112,7 @@ const useStyles = createUseStyles({
         display: 'flex',
         marginTop: '2%',
         width: '100%',
-        height: '100%',
+        height: '90%',
         flexDirection: 'column',
         alignItems: 'center',
     },
@@ -128,7 +128,7 @@ const useStyles = createUseStyles({
         }
     },
     pages: {
-        marginTop: '1%'
+        marginTop: '2%'
     }
 });
 
