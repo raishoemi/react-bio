@@ -1,5 +1,5 @@
-import { getRandomTaxonomyId, queryTaxonomies } from "../../../api";
-import { Entity, Protein, Taxonomy } from "../../../types"
+import { getProteinResultsAmount, getRandomTaxonomyId, getTaxonomyResultsAmount, queryTaxonomies } from './api';
+import { Entity, Protein, Taxonomy } from './types';
 
 abstract class Category {
     constructor(
@@ -9,6 +9,7 @@ abstract class Category {
 
     public abstract getEntities(query: string, limit?: number, offset?: number): Promise<Entity[]>;
     public abstract getRandomId(): Promise<number>;
+    public abstract getQueryResultSize(query: string): Promise<number>;
 }
 
 class TaxonomyCategory extends Category {
@@ -22,6 +23,10 @@ class TaxonomyCategory extends Category {
 
     public getRandomId(): Promise<number> {
         return getRandomTaxonomyId();
+    }
+
+    public getQueryResultSize(query: string): Promise<number> {
+        return getTaxonomyResultsAmount(query);
     }
 }
 
@@ -37,15 +42,18 @@ class ProteinCategory extends Category {
     public getRandomId(): Promise<number> {
         throw new Error("Method not implemented.");
     }
-}
 
-export type SearchResults = {
-    query: string;
-    category: Category;
-    totalItems: number;
-    pages: {
-        [pageNumber: number]: Entity[];
+    public getQueryResultSize(query: string): Promise<number> {
+        return getProteinResultsAmount(query);
     }
 }
 
-export { Category, TaxonomyCategory, ProteinCategory };
+const categories: Record<string, Category> = {};
+[
+    new TaxonomyCategory(),
+    new ProteinCategory()
+].forEach(category => {
+    categories[category.name] = category;
+});
+
+export { Category, TaxonomyCategory, ProteinCategory, categories };

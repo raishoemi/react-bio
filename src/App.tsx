@@ -2,9 +2,10 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import { createUseStyles } from 'react-jss';
 import { Button, Popover } from 'antd';
-import SearchPage from './components/pages/searchPage';
+import SearchResultsPage from './components/pages/searchResultsPage';
 import { Route, Routes } from 'react-router-dom';
 import TaxonomyPage from './components/pages/taxonomyPage';
+import SearchBar from './components/searchBar';
 
 
 const App: React.FunctionComponent = ({ }) => {
@@ -15,8 +16,9 @@ const App: React.FunctionComponent = ({ }) => {
         <img className={classes.logoImage} src='https://p7.hiclipart.com/preview/451/428/959/ikea-logo-sign-brand-business-business.jpg' />
       </div>
       <div className={classes.page}>
+        <SearchBar />
         <Routes>
-          <Route path='/' element={<SearchPage />} />
+          <Route path='search' element={<SearchResultsPage />} />
           <Route path='taxonomy/:id' element={<TaxonomyPage />} />
         </Routes>
       </div>
@@ -49,7 +51,8 @@ const useStyles = createUseStyles({
   },
   page: {
     width: '80vw',
-    height: '100vh'
+    marginTop: '5vh',
+    height: '95vh'
   },
   uniprotDisclaimerContainer: {
     display: 'flex',
