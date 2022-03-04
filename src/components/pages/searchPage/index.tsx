@@ -118,7 +118,7 @@ const useStyles = createUseStyles({
         display: 'flex',
         marginTop: '2%',
         width: '100%',
-        height: '90%',
+        height: '86%',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-between',
