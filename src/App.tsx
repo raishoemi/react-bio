@@ -38,6 +38,7 @@ const App: React.FunctionComponent = ({ }) => {
 const useStyles = createUseStyles({
   container: {
     display: 'flex',
+    overflow: 'hidden'
   },
   logo: {
     display: 'flex',
