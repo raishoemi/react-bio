@@ -53,7 +53,7 @@ async function getResultsAmount(query: string, endpoint: Endpoint): Promise<numb
     let chunksAmount = 0;
     while (currentChinkSize === CHUNKS_SIZE) {
         const response = await fetch(`https://www.uniprot.org/${endpoint}/?query=${query}&sort=score&format=list&limit=${CHUNKS_SIZE}&offset=${chunksAmount * CHUNKS_SIZE}`);
-        currentChinkSize = (await response.text()).split('\n').length;
+        currentChinkSize = (await response.text()).split('\n').length - 1;
         chunksAmount += 1;
         total += currentChinkSize;
     }
