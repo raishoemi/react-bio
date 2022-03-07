@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Pagination, Select, Skeleton, Typography } from 'antd';
+import { Card, Pagination, Progress, Select, Skeleton, Typography } from 'antd';
 import { createUseStyles } from 'react-jss';
 import { Protein, Entity, Taxonomy } from '../../../types';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -120,9 +120,20 @@ const useStyles = createUseStyles({
         alignItems: 'center',
         justifyContent: 'flex-start',
         flexBasis: 0,
-        flexGrow: 1
+        flexGrow: 1,
+        ...Object.assign({}, ...[...Array(PAGE_SIZE).keys()].map(i => {
+            return {
+                [`& > :nth-child(${i + 1})`]: {
+                    'animation-delay': `${i * 10}ms`
+                }
+            }
+        })),
     },
     searchResultItem: {
+        animationDuration: '1s',
+        animationTimingFunction: 'ease-out',
+        animationIterationCount: 1,
+        animationName: '$slideInFromLeft',
         width: '60%',
         marginTop: '1%',
         height: `${(100 / PAGE_SIZE) - 3}%`,
@@ -130,6 +141,16 @@ const useStyles = createUseStyles({
         transition: '150ms ease-out',
         '&:hover': {
             border: '3px solid #1890ff54',
+        },
+    },
+    '@keyframes slideInFromLeft': {
+        from: {
+            transform: 'translateX(-10%)',
+            opacity: 0
+        },
+        to: {
+            transform: 'translateX(0)',
+            opacity: 1
         }
     },
     pages: {
