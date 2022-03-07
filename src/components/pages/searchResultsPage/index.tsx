@@ -77,7 +77,7 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
     return (
         <div className={classes.pageContainer}>
             <div className={classes.searchResultItemsContainer}>
-                {loadingResults ? Array.from(Array(PAGE_SIZE)).map(i => <Skeleton key={i} active={true} paragraph={{ rows: 1 }} className={classes.searchResultItem} />) :
+                {loadingResults ? [...Array(PAGE_SIZE).keys()].map(i => <Skeleton key={i} active={true} paragraph={{ rows: 1 }} className={classes.searchResultItem} />) :
                     searchResults && (searchResults.category instanceof TaxonomyCategory ?
                         (searchResults.pages[currentPageNumber] as Taxonomy[]).map((taxonomy: Taxonomy) => {
                             const lineage = taxonomy.lineage.join(' / ');
