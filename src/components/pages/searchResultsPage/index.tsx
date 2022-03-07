@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Pagination, Select, Typography } from 'antd';
+import { Card, Pagination, Select, Skeleton, Typography } from 'antd';
 import { createUseStyles } from 'react-jss';
 import { Protein, Entity, Taxonomy } from '../../../types';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -45,7 +45,7 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
                 pages: {
                     1: entities
                 }
-            })
+            });
             setLoadingResults(false);
         })();
     }, [location]);
@@ -55,6 +55,7 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
     }
 
     const handlePageChange = (page: number, pageSize: number) => {
+        setLoadingResults(true);
         if (page in searchResults.pages) {
             setCurrentPageNumber(page);
         } else {
@@ -69,33 +70,32 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
                 setCurrentPageNumber(page);
             });
         }
+        setLoadingResults(false);
     };
 
-    if (loadingResults) return (
-        <>skeleton</>
-    );
 
     return (
         <div className={classes.pageContainer}>
             <div className={classes.searchResultItemsContainer}>
-                {searchResults && (searchResults.category instanceof TaxonomyCategory ?
-                    (searchResults.pages[currentPageNumber] as Taxonomy[]).map((taxonomy: Taxonomy) => {
-                        const lineage = taxonomy.lineage.join(' / ');
-                        return (
-                            <Card key={taxonomy.id} hoverable className={classes.searchResultItem}
-                                onClick={() => { navigateToItemPage(taxonomy.id) }}>
-                                <Typography.Paragraph ellipsis={{ tooltip: lineage, rows: 2 }} type='secondary'>
-                                    <Typography.Text strong>{taxonomy.name} &#183; </Typography.Text>
-                                    {lineage}
-                                </Typography.Paragraph>
-                            </Card>
-                        );
-                    })
-                    :
-                    (searchResults.pages[currentPageNumber] as Protein[]).map((protein: Protein) => (
-                        <Card />
-                    ))
-                )}
+                {loadingResults ? Array.from(Array(PAGE_SIZE)).map(i => <Skeleton key={i} active={true} paragraph={{rows: 1}} className={classes.searchResultItem} />) :
+                    searchResults && (searchResults.category instanceof TaxonomyCategory ?
+                        (searchResults.pages[currentPageNumber] as Taxonomy[]).map((taxonomy: Taxonomy) => {
+                            const lineage = taxonomy.lineage.join(' / ');
+                            return (
+                                <Card key={taxonomy.id} hoverable className={classes.searchResultItem}
+                                    onClick={() => { navigateToItemPage(taxonomy.id) }}>
+                                    <Typography.Paragraph ellipsis={{ tooltip: lineage, rows: 2 }} type='secondary'>
+                                        <Typography.Text strong>{taxonomy.name} &#183; </Typography.Text>
+                                        {lineage}
+                                    </Typography.Paragraph>
+                                </Card>
+                            );
+                        })
+                        :
+                        (searchResults.pages[currentPageNumber] as Protein[]).map((protein: Protein) => (
+                            <Card />
+                        ))
+                    )}
             </div>
             <Pagination className={classes.pages} showSizeChanger={false} defaultCurrent={1} defaultPageSize={PAGE_SIZE} hideOnSinglePage responsive total={searchResults?.totalItems} onChange={handlePageChange} />
         </div>
