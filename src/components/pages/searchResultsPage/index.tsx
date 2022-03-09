@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Pagination, Progress, Select, Skeleton, Typography } from 'antd';
+import { Pagination, Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import { createUseStyles } from 'react-jss';
-import { Protein, Entity, Taxonomy } from '../../../types';
+import { Entity } from '../../../types';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { categories, Category, TaxonomyCategory } from '../../../category';
+import { categories, Category } from '../../../category';
+import ResultCard from './resultCard';
 
 const PAGE_SIZE = 6;
+const ANIMATION_DURATION_IN_MS = 200;
 
 type SearchResults = {
     query: string,
     category: Category,
     totalItems: number;
     pages: {
-        [pageNumber: number]: Entity[];
-    }
+        [pageNumber: number]: { unmounting: boolean, entity: Entity }[];
+    },
+    currentPageNumber: number
 }
 
 const SearchResultsPage: React.FunctionComponent<{}> = () => {
@@ -25,27 +29,28 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
         category: categories.Taxonomy,
         totalItems: 0,
         pages: {},
+        currentPageNumber: 1
     });
-    const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
     const [loadingResults, setLoadingResults] = useState<boolean>(true);
 
     useEffect(() => {
         setLoadingResults(true);
-        setCurrentPageNumber(1);
         (async () => {
             const params = new URLSearchParams(location.search);
             const query = params.get('query') ?? ''
             const category = categories[params.get('category') ?? 'Taxonomy'];
             const entities = await category.getEntities(query, PAGE_SIZE);
             const totalItems = await category.getQueryResultSize(query);
-            setSearchResults({
+            const newSearchResults = {
                 query: query,
                 category: category,
                 totalItems: totalItems,
                 pages: {
-                    1: entities
-                }
-            });
+                    1: entities.map(entity => ({ unmounting: false, entity: entity })),
+                },
+                currentPageNumber: 1
+            };
+            setSearchResults(newSearchResults);
             setLoadingResults(false);
         })();
     }, [location]);
@@ -54,50 +59,59 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
         navigate(`/${searchResults.category.name.toLowerCase()}/${itemId}`);
     }
 
-    const handlePageChange = (page: number, pageSize: number) => {
+    const handleResultsUnmounting = (nextPageNumber: number, newSearchResults?: SearchResults) => {
+        const getPage = (unmounting: boolean, pageNumber: number) => (
+            searchResults.pages[pageNumber].map(pageContent =>
+                ({ unmounting: unmounting, entity: pageContent.entity }))
+        );
+        setSearchResults({
+            ...searchResults,
+            pages: {
+                ...searchResults.pages,
+                [searchResults.currentPageNumber]: getPage(true, searchResults.currentPageNumber)
+            }
+        });
+        setTimeout(() => {
+            setSearchResults({
+                ...(newSearchResults ? newSearchResults : searchResults),
+                currentPageNumber: nextPageNumber
+            });
+        }, ANIMATION_DURATION_IN_MS);
+    }
+
+    const handlePageChange = (pageNumber: number, pageSize: number) => {
         setLoadingResults(true);
-        if (page in searchResults.pages) {
-            setCurrentPageNumber(page);
+        if (pageNumber in searchResults.pages) {
+            handleResultsUnmounting(pageNumber);
         } else {
-            searchResults.category.getEntities(searchResults.query, pageSize, (page - 1) * PAGE_SIZE).then(entities => {
-                setSearchResults({
+            searchResults.category.getEntities(searchResults.query, pageSize, (pageNumber - 1) * PAGE_SIZE).then(entities => {
+                const newSearchResults = {
                     ...searchResults,
                     pages: {
                         ...searchResults.pages,
-                        [page]: entities
+                        [pageNumber]: entities.map(entity => ({ unmounting: false, entity: entity }))
                     }
-                });
-                setCurrentPageNumber(page);
+                }
+                handleResultsUnmounting(pageNumber, newSearchResults);
             });
         }
         setLoadingResults(false);
     };
 
-
     return (
         <div className={classes.pageContainer}>
             <div className={classes.searchResultItemsContainer}>
-                {loadingResults ? [...Array(PAGE_SIZE).keys()].map(i => <Skeleton key={i} active={true} paragraph={{ rows: 1 }} className={classes.searchResultItem} />) :
-                    searchResults && (searchResults.category instanceof TaxonomyCategory ?
-                        (searchResults.pages[currentPageNumber] as Taxonomy[]).map((taxonomy: Taxonomy) => {
-                            const lineage = taxonomy.lineage.join(' / ');
-                            return (
-                                <Card key={taxonomy.id} hoverable className={classes.searchResultItem}
-                                    onClick={() => { navigateToItemPage(taxonomy.id) }}>
-                                    <Typography.Paragraph ellipsis={{ tooltip: lineage, rows: 2 }} type='secondary'>
-                                        <Typography.Text strong>{taxonomy.name} &#183; </Typography.Text>
-                                        {lineage}
-                                    </Typography.Paragraph>
-                                </Card>
-                            );
-                        })
-                        :
-                        (searchResults.pages[currentPageNumber] as Protein[]).map((protein: Protein) => (
-                            <Card />
-                        ))
-                    )}
+                {loadingResults ?
+                    <div className={classes.loadingSpinnerContainer}>
+                        <Spin delay={ANIMATION_DURATION_IN_MS} indicator={<LoadingOutlined />} size={'large'} />
+                    </div> :
+                    searchResults && searchResults.pages[searchResults.currentPageNumber].map(pageContent => (
+                        <ResultCard key={pageContent.entity.id} entity={pageContent.entity} pageSize={PAGE_SIZE} unmounting={pageContent.unmounting}
+                            animationDurationInMs={ANIMATION_DURATION_IN_MS} onClick={navigateToItemPage} categoryName={searchResults.category.name} />)
+                    )
+                }
             </div>
-            <Pagination className={classes.pages} current={currentPageNumber} showSizeChanger={false}
+            <Pagination className={classes.pages} current={searchResults.currentPageNumber} showSizeChanger={false}
                 defaultCurrent={1} defaultPageSize={PAGE_SIZE} hideOnSinglePage responsive
                 total={searchResults?.totalItems} onChange={handlePageChange} />
         </div>
@@ -110,6 +124,11 @@ const useStyles = createUseStyles({
         flexDirection: 'column',
         alignItems: 'center',
         height: '87%',
+    },
+    loadingSpinnerContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        height: '100%'
     },
     searchResultItemsContainer: {
         display: 'flex',
@@ -124,34 +143,10 @@ const useStyles = createUseStyles({
         ...Object.assign({}, ...[...Array(PAGE_SIZE).keys()].map(i => {
             return {
                 [`& > :nth-child(${i + 1})`]: {
-                    'animation-delay': `${i * 10}ms`
+                    'animation-delay': `${i * 15}ms`
                 }
             }
         })),
-    },
-    searchResultItem: {
-        animationDuration: '1s',
-        animationTimingFunction: 'ease-out',
-        animationIterationCount: 1,
-        animationName: '$slideInFromLeft',
-        width: '60%',
-        marginTop: '1%',
-        height: `${(100 / PAGE_SIZE) - 3}%`,
-        border: '1px solid #1890ff54',
-        transition: '150ms ease-out',
-        '&:hover': {
-            border: '3px solid #1890ff54',
-        },
-    },
-    '@keyframes slideInFromLeft': {
-        from: {
-            transform: 'translateX(-10%)',
-            opacity: 0
-        },
-        to: {
-            transform: 'translateX(0)',
-            opacity: 1
-        }
     },
     pages: {
         marginTop: '2%'

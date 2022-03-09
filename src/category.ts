@@ -3,7 +3,7 @@ import { Entity, Protein, Taxonomy } from './types';
 
 abstract class Category {
     constructor(
-        public readonly name: string,
+        public readonly name: CategoryName,
         public readonly example: string
     ) { }
 
@@ -14,7 +14,7 @@ abstract class Category {
 
 class TaxonomyCategory extends Category {
     constructor() {
-        super('Taxonomy', 'Homo sapien');
+        super(CategoryName.Taxonomy, 'Homo sapien');
     }
 
     public async getEntities(query: string, limit?: number, offset?: number): Promise<Taxonomy[]> {
@@ -32,7 +32,7 @@ class TaxonomyCategory extends Category {
 
 class ProteinCategory extends Category {
     constructor() {
-        super('Protein', 'Spliceosome');
+        super(CategoryName.Protein, 'Spliceosome');
     }
 
     public getEntities(query: string, limit?: number, offset?: number): Promise<Protein[]> {
@@ -46,6 +46,11 @@ class ProteinCategory extends Category {
     public getQueryResultSize(query: string): Promise<number> {
         return getProteinResultsAmount(query);
     }
+}
+
+export enum CategoryName {
+    Taxonomy = 'Taxonomy',
+    Protein = 'Protein'
 }
 
 const categories: Record<string, Category> = {};
