@@ -24,7 +24,6 @@ export async function getProtein(id: number): Promise<Protein> {
 export async function getRandomTaxonomyId(): Promise<number> {
     return getRandomId(Endpoint.Taxonomy)
 }
-
 export async function getRandomProteinId(): Promise<number> {
     return getRandomId(Endpoint.Protein)
 }
