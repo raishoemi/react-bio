@@ -1,8 +1,18 @@
-import { Protein, Taxonomy } from './types';
+import { Entity, Protein, Taxonomy } from './types';
 
 enum Endpoint {
     Taxonomy = 'taxonomy',
     Protein = 'uniprot'
+}
+
+export class NotFoundError extends Error { }
+
+export interface Lineage {
+    name: string;
+    attributes: {
+        id: number;
+    }
+    children: Lineage[] | undefined;
 }
 
 export async function queryTaxonomies(query: string, limit: number = 20, offset: number = 0): Promise<Taxonomy[]> {
@@ -15,10 +25,14 @@ export async function queryProteins(query: string, limit: number = 20, offset: n
 }
 
 export async function getTaxonomy(id: number): Promise<Taxonomy> {
-    return parseTaxonomyResponse(await getOne(id, Endpoint.Taxonomy));
+    const taxonomy = await parseTaxonomyResponse(await getOne(id, Endpoint.Taxonomy));
+    if (taxonomy.id !== id) throw new NotFoundError();
+    return taxonomy;
 }
 export async function getProtein(id: number): Promise<Protein> {
-    return parseProteinResponse(await getOne(id, Endpoint.Taxonomy));
+    const protein = parseProteinResponse(await getOne(id, Endpoint.Taxonomy));
+    if (protein.id !== id) throw new NotFoundError();
+    return protein;
 }
 
 export async function getRandomTaxonomyId(): Promise<number> {
@@ -33,6 +47,54 @@ export async function getTaxonomyResultsAmount(query: string): Promise<number> {
 }
 export async function getProteinResultsAmount(query: string): Promise<number> {
     return getResultsAmount(query, Endpoint.Protein);
+}
+
+export async function getTaxonomyLineage(id: number): Promise<Lineage> {
+    const ancestoryResponse = await fetch(`https://www.ebi.ac.uk/proteins/api/taxonomy/lineage/${id}`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+    const childrenResponse = await fetch(`https://www.ebi.ac.uk/proteins/api/taxonomy/id/${id}/children?pageNumber=1&pageSize=100`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+    if (!ancestoryResponse.ok || !childrenResponse.ok) {
+        throw new NotFoundError();
+    }
+    // Parse lineage response into Lineage object
+    let ancestoryResponseData: any[] = (await ancestoryResponse.json())['taxonomies'];
+    const ancestory: Entity[] = ancestoryResponseData.map((_: any) => ({ id: _.taxonomyId, name: _.scientificName }));
+    const taxonomy = ancestory.shift();
+    if (!taxonomy) throw new NotFoundError();
+    ancestory.pop(); // last element is empty
+    const root = ancestory.pop() ?? taxonomy;
+    ancestory.reverse();
+    const lineage: Lineage = {
+        name: root.name,
+        attributes: {
+            id: root.id,
+        },
+        children: undefined
+    }
+    let currentLineage = lineage;
+    ancestory.forEach(ancestor => {
+        currentLineage.children = [{
+            name: ancestor.name,
+            attributes: {
+                id: ancestor.id
+            },
+            children: undefined
+        }];
+        currentLineage = currentLineage.children[0];
+    });
+
+    // Insert children at the last lineage node
+    let childrenResponseData = await childrenResponse.json();
+    const children: Entity[] = childrenResponseData['taxonomies'].map((_: any) => ({ id: _.taxonomyId, name: _.scientificName }));
+    currentLineage.children = children.map((_: Entity) => ({ attributes: { id: _.id }, name: _.name, children: undefined }));
+    return lineage;
 }
 
 function parseTaxonomyResponse(response: string): Taxonomy {
@@ -69,9 +131,11 @@ async function queryApi(query: string, endpoint: Endpoint, limit: number = 20, o
 }
 
 async function getOne(id: number, endpoint: Endpoint): Promise<string> {
-    const response = await fetch(`https://www.uniprot.org/taxonomy/?query=${id}&format=tab`);
+    const response = await fetch(`https://www.uniprot.org/taxonomy/?query=${id}&format=tab&sort=score`);
     const responseText = await response.text();
-    return responseText.split('\n')[1];
+    const lines = responseText.split('\n')
+    if (lines.length === 1) throw new NotFoundError();
+    return lines[1];
 }
 
 async function getRandomId(endpoint: Endpoint): Promise<number> {

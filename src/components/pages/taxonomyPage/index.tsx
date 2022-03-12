@@ -1,10 +1,12 @@
-import { LoadingOutlined } from '@ant-design/icons';
-import { Collapse, Spin, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { Collapse, Spin, Typography } from 'antd';
+import Tree from 'react-d3-tree';
+import { LoadingOutlined } from '@ant-design/icons';
 import { createUseStyles } from 'react-jss';
 import { useParams } from 'react-router-dom';
-import { getTaxonomy } from '../../../api';
+import { getTaxonomy, getTaxonomyLineage, Lineage } from '../../../api';
 import { Taxonomy } from '../../../types';
+import { RawNodeDatum } from 'react-d3-tree/lib/types/common';
 
 const InfoPanelItem: React.FC<{ name: string, value: string, extraNameProps?: {}, extraValueProps?: {} }> = (props) => (
     <Typography.Paragraph>
@@ -16,12 +18,20 @@ const InfoPanelItem: React.FC<{ name: string, value: string, extraNameProps?: {}
 const TaxonomyPage: React.FC<{}> = () => {
     const { id } = useParams();
     const [taxonomy, setTaxonomy] = useState<Taxonomy>();
+    const [taxonomyLineage, setTaxonomyLineage] = useState<RawNodeDatum | null>(null);
     const classes = useStyles();
     useEffect(() => {
         if (!id) return;
         getTaxonomy(parseInt(id)).then(taxonomy => {
             setTaxonomy(taxonomy);
         });
+    }, [id]);
+    useEffect(() => {
+        if (!id) return;
+        (async () => {
+            const lineage = await getTaxonomyLineage(parseInt(id));
+            setTaxonomyLineage(lineage);
+        })();
     }, [id]);
 
     if (!id) return <div>ERROR COMPONENT PLACEHOLDER</div>;
@@ -41,8 +51,11 @@ const TaxonomyPage: React.FC<{}> = () => {
                     <InfoPanelItem name='Lineage' value={taxonomy.lineage.join(' / ')} />
                 </Collapse.Panel>
                 <Collapse.Panel forceRender header="Tree" key="2">
+                    {taxonomyLineage ?
+                        <Tree data={taxonomyLineage} orientation={'vertical'} /> :
+                        <div>loading</div>}
                 </Collapse.Panel>
-            </Collapse>,
+            </Collapse>
         </div>
     );
 }
