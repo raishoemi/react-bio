@@ -55,7 +55,7 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
         })();
     }, [location]);
 
-    function navigateToItemPage(itemId: number) {
+    function navigateToItemPage(itemId: string) {
         navigate(`/${searchResults.category.name.toLowerCase()}/${itemId}`);
     }
 

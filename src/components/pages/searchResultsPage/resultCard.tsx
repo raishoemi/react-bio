@@ -6,7 +6,7 @@ import { CategoryName } from '../../../category';
 
 type ResultCardProps = {
     entity: Entity,
-    onClick: (id: number) => void,
+    onClick: (id: string) => void,
     pageSize: number,
     categoryName: CategoryName,
     animationDurationInMs: number,
@@ -45,6 +45,9 @@ const useStyles = createUseStyles({
         '&:hover': {
             border: '3px solid #1890ff54',
         },
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
     },
     mountingAnimation: {
         animationName: '$slideIn',

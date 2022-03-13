@@ -1,4 +1,5 @@
-import { getProteinResultsAmount, getRandomTaxonomyId, getTaxonomyResultsAmount, queryTaxonomies } from './api';
+import { getRandomTaxonomyId, getTaxonomyResultsAmount, queryTaxonomies } from './api/taxonomy';
+import { getProteinResultsAmount } from './api/protein';
 import { Entity, Protein, Taxonomy } from './types';
 
 abstract class Category {

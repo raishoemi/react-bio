@@ -1,11 +1,13 @@
+import { NotFoundError } from "./errors";
+
 export interface Entity {
-    id: number;
+    id: string;
     name: string;
 }
 
 export class Taxonomy implements Entity {
     constructor(
-        public readonly id: number,
+        public readonly id: string,
         public readonly scientificName: string,
         public readonly commonName: string,
         public readonly mnemonic: string,
@@ -25,9 +27,38 @@ export class Taxonomy implements Entity {
     }
 }
 
+export class Lineage {
+    constructor(
+        public readonly name: string,
+        public readonly attributes: { id: string; },
+        public children: Lineage[] | undefined
+    ) { }
+
+    public static fromNode(lineage: Lineage): Lineage {
+        return new Lineage(
+            lineage.name,
+            lineage.attributes,
+            lineage.children
+        )
+    }
+
+    public getNode(id: string): Lineage | undefined {
+        if (this.attributes.id.toString() === id) return this;
+        if (this.children) {
+            for (const child of this.children) {
+                const node = child.getNode(id);
+                if (node) return node;
+            }
+        }
+        return undefined;
+    }
+}
+
+// https://www.uniprot.org/uniprot/?query=reviewed:yes+AND+organism:9606&format=tab
+
 export class Protein implements Entity {
     constructor(
-        public readonly id: number,
+        public readonly id: string,
         public readonly name: string,
     ) { }
 }
