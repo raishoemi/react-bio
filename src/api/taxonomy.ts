@@ -52,6 +52,10 @@ export async function getTaxonomyLineage(id: string): Promise<Lineage> {
     });
 
     // Insert children at the last lineage node
+    if (root.id !== taxonomy.id) {
+        currentLineage.children = [new Lineage(taxonomy.name, { id: taxonomy.id }, undefined)];
+        currentLineage = currentLineage.children[0];
+    }
     currentLineage.children = await getTaxonomyChildren(id);
     return lineage;
 }
