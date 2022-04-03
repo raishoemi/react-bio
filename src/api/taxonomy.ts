@@ -56,7 +56,15 @@ export async function getTaxonomyLineage(id: string): Promise<Lineage> {
         currentLineage.children = [new Lineage(taxonomy.name, { id: taxonomy.id }, undefined)];
         currentLineage = currentLineage.children[0];
     }
-    currentLineage.children = await getTaxonomyChildren(id);
+    try {
+        currentLineage.children = await getTaxonomyChildren(id);
+    } catch (e: any) {
+        if (e instanceof NotFoundError) {
+            // No children, do nothing
+        } else {
+            throw e;
+        }
+    }
     return lineage;
 }
 

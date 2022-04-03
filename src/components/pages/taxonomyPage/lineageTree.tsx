@@ -1,13 +1,14 @@
 import { Button, Popover, Typography } from 'antd';
 import Tree from 'react-d3-tree';
-import React, { useEffect, useState } from 'react';
-import { CustomNodeElementProps, RawNodeDatum } from 'react-d3-tree/lib/types/common';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
+import { CustomNodeElementProps, RawNodeDatum, TreeNodeDatum } from 'react-d3-tree/lib/types/common';
+import { HierarchyPointNode } from 'd3-hierarchy';
 import { createUseStyles } from 'react-jss';
 import { Lineage } from '../../../types';
 
 type LineageTreeProps = {
-    lineage: Lineage | null;
-    style: {};
+    lineage: Lineage;
+    style?: {};
     loadChildren: (nodeId: number) => Promise<void>;
     hideChildren: (nodeId: number) => Promise<void>;
 }
