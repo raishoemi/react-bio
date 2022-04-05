@@ -1,13 +1,10 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
-import { Button, Collapse, Modal, notification, Popover, Spin, Typography } from 'antd';
-import Tree from 'react-d3-tree';
+import React, { useEffect, useState } from 'react';
+import { Button, Collapse, Modal, notification, Spin, Typography } from 'antd';
 import { ExpandAltOutlined, LoadingOutlined } from '@ant-design/icons';
 import { createUseStyles } from 'react-jss';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getTaxonomy, getTaxonomyChildren, getTaxonomyLineage } from '../../../api/taxonomy';
 import { Lineage, Taxonomy } from '../../../types';
-import { CustomNodeElementProps, RawNodeDatum, TreeNodeDatum } from 'react-d3-tree/lib/types/common';
-import { HierarchyPointNode } from 'd3-hierarchy';
 import LineageTree from './lineageTree';
 import { NotFoundError } from '../../../errors';
 
@@ -25,6 +22,7 @@ const TaxonomyPage: React.FC<{}> = () => {
     const [isLineageModalVisible, setLineageModalVisible] = useState<boolean>(false);
     const [isLineageLoading, setLineageLoading] = useState<boolean>(true);
     const [isLineageUnavailable, setLineageUnavailable] = useState<boolean>(false);
+    const navigate = useNavigate()
     const classes = useStyles();
 
     useEffect(() => {
@@ -93,6 +91,10 @@ const TaxonomyPage: React.FC<{}> = () => {
         setTaxonomyLineage(newTaxonomyLineagee);
     };
 
+    const navigateToTaxonomyPage = async (nodeId: number) => {
+        navigate(`/taxonomy/${nodeId}`);
+    }
+
     if (!id) return <div>NOT FOUND COMPONENT PLACEHOLDER</div>;
 
     if (!taxonomy) return <div className={classes.pageContainer}><Spin delay={500} indicator={<LoadingOutlined />} size={'large'} /></div>;
@@ -114,7 +116,7 @@ const TaxonomyPage: React.FC<{}> = () => {
                         <Typography.Text italic>Lineage tree unavailable for this taxonomy</Typography.Text>
                         :
                         <div className={classes.treePanelContainer}>
-                            {taxonomyLineage && <LineageTree lineage={taxonomyLineage} style={{ height: '30vh', width: '100%' }} loadChildren={loadChildren} hideChildren={hideChildren} />}
+                            {taxonomyLineage && <LineageTree lineage={taxonomyLineage} style={{ height: '30vh', width: '100%' }} loadChildren={loadChildren} hideChildren={hideChildren} goToTaxonomyPage={navigateToTaxonomyPage} />}
                             <div>
                                 {isLineageLoading && <Spin delay={500} indicator={<LoadingOutlined />} size={'large'} />}
                                 <Button icon={<ExpandAltOutlined />} onClick={() => setLineageModalVisible(true)} />
@@ -130,7 +132,7 @@ const TaxonomyPage: React.FC<{}> = () => {
                                 className={`ant-modal-content ${classes.lineageModalContainer}`}
                             >
                                 <div style={{ width: '100%', height: '80vh' }}>
-                                    {taxonomyLineage && <LineageTree style={{ width: '100%', height: '100%' }} lineage={taxonomyLineage} loadChildren={loadChildren} hideChildren={hideChildren} />}
+                                    {taxonomyLineage && <LineageTree style={{ width: '100%', height: '100%' }} lineage={taxonomyLineage} loadChildren={loadChildren} hideChildren={hideChildren} goToTaxonomyPage={navigateToTaxonomyPage} />}
                                     <div style={{ position: 'absolute', right: '1%', bottom: '1%' }}>
                                         {isLineageLoading && <Spin delay={500} indicator={<LoadingOutlined />} size={'large'} />}
                                     </div>

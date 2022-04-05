@@ -1,8 +1,7 @@
 import { Button, Popover, Typography } from 'antd';
 import Tree from 'react-d3-tree';
-import React, { SyntheticEvent, useEffect, useState } from 'react';
-import { CustomNodeElementProps, RawNodeDatum, TreeNodeDatum } from 'react-d3-tree/lib/types/common';
-import { HierarchyPointNode } from 'd3-hierarchy';
+import React, { useState } from 'react';
+import { CustomNodeElementProps, RawNodeDatum } from 'react-d3-tree/lib/types/common';
 import { createUseStyles } from 'react-jss';
 import { Lineage } from '../../../types';
 
@@ -11,6 +10,7 @@ type LineageTreeProps = {
     style?: {};
     loadChildren: (nodeId: number) => Promise<void>;
     hideChildren: (nodeId: number) => Promise<void>;
+    goToTaxonomyPage: (nodeId: number) => Promise<void>;
 }
 
 const LineageTree: React.FC<LineageTreeProps> = (props: LineageTreeProps) => {
@@ -31,6 +31,10 @@ const LineageTree: React.FC<LineageTreeProps> = (props: LineageTreeProps) => {
                     props.hideChildren(nodeId);
                     hidePopover();
                 }}>Hide Children</Button>
+                <Button type='dashed' onClick={() => {
+                    hidePopover();
+                    props.goToTaxonomyPage(nodeId);
+                }}>Go To Page</Button>
             </div>
         );
     };
