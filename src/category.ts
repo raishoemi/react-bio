@@ -1,5 +1,5 @@
 import { getRandomTaxonomyId, getTaxonomyResultsAmount, queryTaxonomies } from './api/taxonomy';
-import { getProteinResultsAmount } from './api/protein';
+import { getProteinResultsAmount, getRandomProteinId, queryProteins } from './api/protein';
 import { Entity, Protein, Taxonomy } from './types';
 
 abstract class Category {
@@ -37,11 +37,11 @@ class ProteinCategory extends Category {
     }
 
     public getEntities(query: string, limit?: number, offset?: number): Promise<Protein[]> {
-        throw new Error("Method not implemented.");
+        return queryProteins(query, limit, offset);
     }
 
     public getRandomId(): Promise<number> {
-        throw new Error("Method not implemented.");
+        return getRandomProteinId();
     }
 
     public getQueryResultSize(query: string): Promise<number> {

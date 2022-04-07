@@ -1,8 +1,11 @@
+
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-import { Card, Typography } from 'antd';
-import { Entity, Taxonomy } from '../../../types';
-import { CategoryName } from '../../../category';
+import { Card } from 'antd';
+import { Entity, Protein, Taxonomy } from '../../../../types';
+import { CategoryName } from '../../../../category';
+import TaxonomyCard from './taxonomyCard';
+import ProteinCard from './proteinCard';
 
 type ResultCardProps = {
     entity: Entity,
@@ -15,20 +18,18 @@ type ResultCardProps = {
 
 const ResultCard: React.FC<ResultCardProps> = (props) => {
     const classes = useStyles(props);
-
-    if (props.categoryName === CategoryName.Taxonomy) {
-        const taxonomy = props.entity as Taxonomy;
-        const lineage = taxonomy.lineage.join(' / ');
-        const animationClassName = props.unmounting ? classes.unmountingAnimation : classes.mountingAnimation;
-        return (<Card hoverable onClick={() => props.onClick(taxonomy.id)}
-            className={classes.searchResultItem + ` ${animationClassName}`}>
-            <Typography.Paragraph ellipsis={{ tooltip: lineage, rows: 2 }} type='secondary'>
-                <Typography.Text strong>{taxonomy.name} &#183; </Typography.Text>
-                {lineage}
-            </Typography.Paragraph>
-        </Card>);
-    }
-    return (<div></div>);
+    const animationClassName = props.unmounting ? classes.unmountingAnimation : classes.mountingAnimation;
+    return <Card hoverable onClick={() => props.onClick(props.entity.id)}
+        className={classes.searchResultItem + ` ${animationClassName}`}>
+        {
+            props.categoryName === CategoryName.Taxonomy ?
+                <TaxonomyCard taxonomy={props.entity as Taxonomy} />
+                : props.categoryName === CategoryName.Protein ?
+                    <ProteinCard protein={props.entity as Protein} />
+                    :
+                    <div>unknown category placeholder</div>
+        }
+    </Card>;
 };
 
 const useStyles = createUseStyles({

@@ -5,7 +5,7 @@ import { createUseStyles } from 'react-jss';
 import { Entity } from '../../../types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { categories, Category } from '../../../category';
-import ResultCard from './resultCard';
+import ResultItem from './resultCard';
 
 const PAGE_SIZE = 6;
 const ANIMATION_DURATION_IN_MS = 200;
@@ -106,7 +106,7 @@ const SearchResultsPage: React.FunctionComponent<{}> = () => {
                         <Spin delay={ANIMATION_DURATION_IN_MS} indicator={<LoadingOutlined />} size={'large'} />
                     </div> :
                     searchResults && searchResults.pages[searchResults.currentPageNumber].map(pageContent => (
-                        <ResultCard key={pageContent.entity.id} entity={pageContent.entity} pageSize={PAGE_SIZE} unmounting={pageContent.unmounting}
+                        <ResultItem key={pageContent.entity.id} entity={pageContent.entity} pageSize={PAGE_SIZE} unmounting={pageContent.unmounting}
                             animationDurationInMs={ANIMATION_DURATION_IN_MS} onClick={navigateToItemPage} categoryName={searchResults.category.name} />)
                     )
                 }

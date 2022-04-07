@@ -1,9 +1,9 @@
 import { Button, Select } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { categories, Category } from '../../category';
 import SearchBox from './searchBox';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const DEFAULT_CATEGORY_NAME = 'Taxonomy' // TODO: Could be retrieved dynamically somehow
 
@@ -11,17 +11,23 @@ const SearchBar: React.FC<{}> = () => {
     const classes = useStyles();
     const navigate = useNavigate();
     const [chosenCategory, setChosenCategory] = useState<string>(DEFAULT_CATEGORY_NAME);
+    const location = useLocation();
 
     const onSearch = (query: string): void => {
         navigate(`/search?query=${query}&category=${chosenCategory}`, { replace: true });
     };
 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        setChosenCategory(params.get('category') ?? DEFAULT_CATEGORY_NAME);
+    }, [location]);
+
     async function onRandomItem(): Promise<void> {
         const randomItemId = await categories[chosenCategory].getRandomId();
-        navigateToItemPage(randomItemId);
+        navigateToItemPage(randomItemId.toString());
     }
 
-    function navigateToItemPage(itemId: number) {
+    function navigateToItemPage(itemId: string) {
         navigate(`/${chosenCategory.toLowerCase()}/${itemId}`);
     }
 
@@ -32,6 +38,7 @@ const SearchBar: React.FC<{}> = () => {
                 dropdownMatchSelectWidth={false}
                 onSelect={setChosenCategory}
                 style={{ flex: 0.1 }}
+                value={chosenCategory}
             >
                 {Object.keys(categories).map(categoryName => (
                     <Select.Option key={categoryName} value={categoryName}>{categoryName}</Select.Option>

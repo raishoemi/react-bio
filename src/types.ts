@@ -1,8 +1,14 @@
-import { NotFoundError } from "./errors";
-
 export interface Entity {
     id: string;
     name: string;
+}
+
+export enum ProteinEvidence {
+    ProteinLevelEvidence = 'Experimental evidence at protein level',
+    TranscriptLevelEvidence = 'Experimental evidence at transcript level',
+    InferredFromHomology = 'Protein inferred from homology',
+    Predicted = 'Protein predicted',
+    Uncertain = 'Protein uncertain'
 }
 
 export class Taxonomy implements Entity {
@@ -23,7 +29,7 @@ export class Taxonomy implements Entity {
         if (this.commonName) return this.commonName;
         if (this.scientificName) return this.scientificName;
         if (this.mnemonic) return this.mnemonic;
-        return this.id.toString();
+        return this.id;
     }
 }
 
@@ -59,6 +65,33 @@ export class Lineage {
 export class Protein implements Entity {
     constructor(
         public readonly id: string,
-        public readonly name: string,
+        public readonly recommendedName: string,
+        public readonly submittedName: string,
+        public readonly alternativeNames: { [fullName: string]: string[] } | undefined,
+        public readonly organism: {
+            name: {
+                scientific: string,
+                common: string
+            },
+            id: string
+        },
+        public readonly reviewed: boolean,
+        public readonly sequence: {
+            value: string,
+            mass: number,
+            length: number
+        },
+        public readonly evidence: ProteinEvidence,
+        public readonly gene: {
+            name: string,
+            orfNames: string[]
+        } | undefined
     ) { }
+
+    public get name(): string {
+        if (this.recommendedName) return this.recommendedName;
+        if (this.submittedName) return this.submittedName;
+        if (this.alternativeNames) return Object.keys(this.alternativeNames)[0];
+        return this.id;
+    }
 }
