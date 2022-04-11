@@ -65,33 +65,30 @@ export class Lineage {
 export class Protein implements Entity {
     constructor(
         public readonly id: string,
-        public readonly recommendedName: string,
-        public readonly submittedName: string,
-        public readonly alternativeNames: { [fullName: string]: string[] } | undefined,
-        public readonly organism: {
-            name: {
-                scientific: string,
-                common: string
-            },
-            id: string
-        },
+        public readonly name: string,
         public readonly reviewed: boolean,
-        public readonly sequence: {
-            value: string,
-            mass: number,
-            length: number
-        },
         public readonly evidence: ProteinEvidence,
         public readonly gene: {
-            name: string,
+            primaryName: string,
+            alternativeNames: string[],
             orfNames: string[]
-        } | undefined
+        },
+        public readonly taxonomy: {
+            name: string,
+            id: string
+        },
+        public readonly sequence: string,
+        public readonly sequenceLength: number,
+        public readonly proteome: {
+            id: string,
+            chromosome: string
+        }
     ) { }
 
-    public get name(): string {
-        if (this.recommendedName) return this.recommendedName;
-        if (this.submittedName) return this.submittedName;
-        if (this.alternativeNames) return Object.keys(this.alternativeNames)[0];
-        return this.id;
+    public get geneName(): string {
+        if (this.gene.primaryName) return this.gene.primaryName;
+        if (this.gene.alternativeNames) return this.gene.alternativeNames[0];
+        if (this.gene.orfNames) return this.gene.orfNames[0];
+        return this.id.toString();
     }
 }

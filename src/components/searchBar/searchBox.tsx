@@ -6,7 +6,7 @@ import { Entity } from '../../types';
 
 type SearchBoxProps = {
     example: string;
-    queryFunction: (query: string) => Promise<Entity[]>;
+    onAutoCompleteQuery: (query: string) => Promise<Entity[]>;
     onSearch: (query: string) => void;
     onSelected: (id: string) => void;
     style: object;
@@ -20,11 +20,10 @@ const SearchBox: React.FunctionComponent<SearchBoxProps> = (props: SearchBoxProp
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         setQuery(params.get('query') ?? '');
-        console.log(params.get('query'));
     }, [location]);
 
     const handleInputChanged = (query: string) => {
-        props.queryFunction(query).then((results: Entity[]) => {
+        props.onAutoCompleteQuery(query).then((results: Entity[]) => {
             setOptions(results.slice(0, 4).map((result: Entity) => { return { label: result.name, value: result.id.toString() } }));
         });
     };

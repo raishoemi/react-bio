@@ -1,24 +1,27 @@
 import { NotFoundError } from '../errors';
 import { Entity, Lineage, Protein, Taxonomy } from '../types';
-import { Endpoint, getOne, getRandomId, getResultsAmount, queryApi } from './common';
+import {  getOne, getRandomId, getResultsAmount, queryApi } from './common';
+
+const TAXONOMY_QUERY_ENDPOINT = 'taxonomy';
+
 
 export async function queryTaxonomies(query: string, limit: number = 20, offset: number = 0): Promise<Taxonomy[]> {
-    const lines = await queryApi(query, Endpoint.Taxonomy, limit, offset);
+    const lines = await queryApi(query, TAXONOMY_QUERY_ENDPOINT, limit, offset);
     return lines.map(parseTaxonomyResponse);
 }
 
 export async function getTaxonomy(id: string): Promise<Taxonomy> {
-    const taxonomy = await parseTaxonomyResponse(await getOne(id, Endpoint.Taxonomy));
+    const taxonomy = await parseTaxonomyResponse(await getOne(id, TAXONOMY_QUERY_ENDPOINT));
     if (taxonomy.id !== id) throw new NotFoundError();
     return taxonomy;
 }
 
 export async function getRandomTaxonomyId(): Promise<number> {
-    return getRandomId(Endpoint.Taxonomy)
+    return getRandomId(TAXONOMY_QUERY_ENDPOINT)
 }
 
 export async function getTaxonomyResultsAmount(query: string): Promise<number> {
-    return getResultsAmount(query, Endpoint.Taxonomy);
+    return getResultsAmount(query, TAXONOMY_QUERY_ENDPOINT);
 }
 
 export async function getTaxonomyLineage(id: string): Promise<Lineage> {

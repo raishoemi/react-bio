@@ -6,6 +6,7 @@ import SearchResultsPage from './components/pages/searchResultsPage';
 import { Route, Routes } from 'react-router-dom';
 import TaxonomyPage from './components/pages/taxonomyPage';
 import SearchBar from './components/searchBar';
+import ProteinPage from './components/pages/proteinPage';
 
 
 const App: React.FunctionComponent = ({ }) => {
@@ -20,6 +21,7 @@ const App: React.FunctionComponent = ({ }) => {
         <Routes>
           <Route path='search' element={<SearchResultsPage />} />
           <Route path='taxonomy/:id' element={<TaxonomyPage />} />
+          <Route path='protein/:id' element={<ProteinPage />} />
         </Routes>
       </div>
       <div className={classes.uniprotDisclaimerContainer} style={{ 'backgroundImage': 'https://www.uniprot.org/images/UniProt_Headerimage.png' }}>

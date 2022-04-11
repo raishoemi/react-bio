@@ -1,6 +1,8 @@
 import { NotFoundError } from "../errors";
 import { Protein, ProteinEvidence } from "../types";
-import { Endpoint, getOne, getRandomId, getResultsAmount, queryApi } from "./common";
+import { getOne, getRandomId, getResultsAmount, queryApi } from "./common";
+
+const PROTEIN_QUERY_ENDPOINT = 'uniprot';
 
 const proteinEvidence: { [key: string]: ProteinEvidence } = {
     'Evidence at protein level': ProteinEvidence.ProteinLevelEvidence,
@@ -9,70 +11,62 @@ const proteinEvidence: { [key: string]: ProteinEvidence } = {
     'Predicted': ProteinEvidence.Predicted
 }
 
+const proteinQueryColumns = [
+    'id',
+    'protein names',
+    'reviwed',
+    'existence',
+    'genes(PREFERRED)',
+    'genes(ALTERNATIVE)',
+    'genes(ORF)',
+    'organism',
+    'organism-id',
+    'proteome',
+    'sequence',
+    'length'
+]
+
 export async function queryProteins(query: string, limit: number = 20, offset: number = 0): Promise<Protein[]> {
-    const response = await fetch(`https://www.ebi.ac.uk/proteins/api/proteins?offset=${offset}&size=${limit}&protein=${query}`, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-    const proteinsJson = await response.json();
-    return proteinsJson.map(parseProteinResponse);
+    const lines = await queryApi(query, PROTEIN_QUERY_ENDPOINT, limit, offset, proteinQueryColumns);
+    return lines.map(parseProteinQueryResponse);
 }
+
 export async function getProtein(id: string): Promise<Protein> {
-    const response = await fetch(`https://www.ebi.ac.uk/proteins/api/proteins/${id}`, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    })
-    return parseProteinResponse(await response.json())
+    const protein = await parseProteinQueryResponse(await getOne(id, PROTEIN_QUERY_ENDPOINT));
+    if (protein.id !== id) throw new NotFoundError();
+    return protein;
 }
+
 export async function getRandomProteinId(): Promise<number> {
-    return getRandomId(Endpoint.Protein)
+    return getRandomId(PROTEIN_QUERY_ENDPOINT)
 }
+
 export async function getProteinResultsAmount(query: string): Promise<number> {
-    const response = await fetch(`https://www.ebi.ac.uk/proteins/api/proteins?size=1&protein=${query}`, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-    const totalRecordsHeader = response.headers.get("x-pagination-totalrecords")
-    if (!totalRecordsHeader) throw new Error("No total records header");
-    return parseInt(totalRecordsHeader);
+    return getResultsAmount(query, PROTEIN_QUERY_ENDPOINT);
 }
-function parseProteinResponse(response: any): Protein {
-    const organismNames = response.organism.names;
-    const scientificTaxonomyName = organismNames.filter((name: any) => name.type === 'scientific').at(0)
-    const commonTaxonomyName = organismNames.filter((name: any) => name.type === 'common').at(0)
 
+function parseProteinQueryResponse(line: string): Protein {
+    const [id, proteinNames, reviewed, existence, preferredGeneName, alternativeGeneNames,
+        orfNames, organismName, organismId, proteome, sequence, sequenceLength] = line.split('\t');
     return new Protein(
-        response.accession,
-        response.protein.recommendedName ? response.protein.recommendedName.fullName.value : '',
-        response.protein.submittedName ? response.protein.submittedName[0].fullName.value : '',
-        parseAlternativeNames(response),
+        id,
+        proteinNames.split('(')[0].trim(),
+        reviewed === 'reviewed',
+        proteinEvidence[existence] ?? ProteinEvidence.Uncertain,
         {
-            name: {
-                scientific: scientificTaxonomyName ? scientificTaxonomyName.value : '',
-                common: commonTaxonomyName ? commonTaxonomyName.value : ''
-            },
-            id: response.organism.taxonomy.toString()
+            primaryName: preferredGeneName,
+            alternativeNames: alternativeGeneNames.split(' '),
+            orfNames: orfNames.split(' ')
         },
-        response.info.type.toLowerCase() === 'swiss-prot',
         {
-            value: response.sequence.sequence,
-            mass: response.sequence.mass,
-            length: response.sequence.length
+            name: organismName,
+            id: organismId
         },
-        proteinEvidence[response.proteinExistence] ?? ProteinEvidence.Uncertain,
-        response.gene ? (response.gene.at(0) ? {
-            name: response.gene[0].name,
-            orfNames: response.gene[0].orfNames?.map((name: any) => name.value),
-        } : undefined) : undefined
+        sequence,
+        parseInt(sequenceLength),
+        {
+            id: proteome.split(' ')[0],
+            chromosome: proteome.substring(proteome.indexOf(' ') + 1)
+        }
     );
-}
-
-function parseAlternativeNames(response: any): { [fullName: string]: string[] } | undefined {
-    if (!response.protein.alternativeName) return undefined;
-    return response.protein.alternativeName.map((altName: any) => ({
-        [altName.fullName.valuue]: altName.shortName.map((shortName: any) => shortName.value)
-    }));
 }
