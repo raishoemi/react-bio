@@ -7,13 +7,9 @@ import { getTaxonomy, getTaxonomyChildren, getTaxonomyLineage } from '../../../a
 import { Lineage, Taxonomy } from '../../../types';
 import LineageTree from './lineageTree';
 import { NotFoundError } from '../../../errors';
+import { ItemPage, LoadingItemPage } from '../itemPage';
+import DetailsPanelItem from '../itemPage/detailsPanelItem';
 
-const InfoPanelItem: React.FC<{ name: string, value: string, extraNameProps?: {}, extraValueProps?: {} }> = (props) => (
-    <Typography.Paragraph>
-        <Typography.Text {...props.extraNameProps} disabled={!props.value} strong>{props.name}: </Typography.Text>
-        <Typography.Text {...props.extraValueProps} disabled={!props.value} italic={!props.value}>{props.value || 'No data available'}</Typography.Text>
-    </Typography.Paragraph>
-);
 
 const TaxonomyPage: React.FC<{}> = () => {
     const { id } = useParams();
@@ -97,21 +93,25 @@ const TaxonomyPage: React.FC<{}> = () => {
 
     if (!id) return <div>NOT FOUND COMPONENT PLACEHOLDER</div>;
 
-    if (!taxonomy) return <div className={classes.pageContainer}><Spin delay={500} indicator={<LoadingOutlined />} size={'large'} /></div>;
+    if (!taxonomy) return <LoadingItemPage />;
 
     return (
-        <div className={classes.pageContainer}>
-            <Typography.Title level={3}>{taxonomy.name}</Typography.Title>
-            <Collapse defaultActiveKey={['1']} style={{ width: '80%' }}>
-                <Collapse.Panel forceRender header="Details" key="1">
-                    <InfoPanelItem extraValueProps={{ copyable: true }} name='Uniprot ID' value={taxonomy.id.toString()} />
-                    <InfoPanelItem name='Common Name' value={taxonomy.commonName} />
-                    <InfoPanelItem name='Scientific Name' value={taxonomy.scientificName} />
-                    <InfoPanelItem name='Mnemonic' value={taxonomy.mnemonic} />
-                    <InfoPanelItem name='Rank' value={taxonomy.rank} />
-                    <InfoPanelItem name='Lineage' value={taxonomy.lineage.join(' / ')} />
-                </Collapse.Panel>
-                <Collapse.Panel forceRender header="Tree" key="2">
+        <ItemPage title={taxonomy.name} panels={[
+            {
+                title: 'Details',
+                component: <>
+                    <DetailsPanelItem extraValueProps={{ copyable: true }} name='Uniprot ID' value={taxonomy.id.toString()} />
+                    <DetailsPanelItem name='Common Name' value={taxonomy.commonName} />
+                    <DetailsPanelItem name='Scientific Name' value={taxonomy.scientificName} />
+                    <DetailsPanelItem name='Mnemonic' value={taxonomy.mnemonic} />
+                    <DetailsPanelItem name='Rank' value={taxonomy.rank} />
+                    <DetailsPanelItem name='Lineage' value={taxonomy.lineage.join(' / ')} />
+                </>,
+                forceRender: true
+            },
+            {
+                title: 'Tree',
+                component: <>
                     {isLineageUnavailable ?
                         <Typography.Text italic>Lineage tree unavailable for this taxonomy</Typography.Text>
                         :
@@ -140,9 +140,10 @@ const TaxonomyPage: React.FC<{}> = () => {
                             </Modal>
                         </div>
                     }
-                </Collapse.Panel>
-            </Collapse>
-        </div>
+                </>,
+                forceRender: true
+            }
+        ]} />
     );
 }
 
