@@ -14,7 +14,7 @@ const proteinEvidence: { [key: string]: ProteinEvidence } = {
 const proteinQueryColumns = [
     'id',
     'protein names',
-    'reviwed',
+    'reviewed',
     'existence',
     'genes(PREFERRED)',
     'genes(ALTERNATIVE)',
