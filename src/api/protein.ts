@@ -17,8 +17,6 @@ const proteinQueryColumns = [
     'reviewed',
     'existence',
     'genes(PREFERRED)',
-    'genes(ALTERNATIVE)',
-    'genes(ORF)',
     'organism',
     'organism-id',
     'proteome',
@@ -32,7 +30,7 @@ export async function queryProteins(query: string, limit: number = 20, offset: n
 }
 
 export async function getProtein(id: string): Promise<Protein> {
-    const protein = await parseProteinQueryResponse(await getOne(id, PROTEIN_QUERY_ENDPOINT));
+    const protein = await parseProteinQueryResponse(await getOne(id, PROTEIN_QUERY_ENDPOINT, proteinQueryColumns));
     if (protein.id !== id) throw new NotFoundError();
     return protein;
 }
@@ -46,18 +44,14 @@ export async function getProteinResultsAmount(query: string): Promise<number> {
 }
 
 function parseProteinQueryResponse(line: string): Protein {
-    const [id, proteinNames, reviewed, existence, preferredGeneName, alternativeGeneNames,
-        orfNames, organismName, organismId, proteome, sequence, sequenceLength] = line.split('\t');
+    const [id, proteinNames, reviewed, existence, preferredGeneName,
+        organismName, organismId, proteome, sequence, sequenceLength] = line.split('\t');
     return new Protein(
         id,
         proteinNames.split('(')[0].trim(),
         reviewed === 'reviewed',
         proteinEvidence[existence] ?? ProteinEvidence.Uncertain,
-        {
-            primaryName: preferredGeneName,
-            alternativeNames: alternativeGeneNames.split(' '),
-            orfNames: orfNames.split(' ')
-        },
+        preferredGeneName,
         {
             name: organismName,
             id: organismId

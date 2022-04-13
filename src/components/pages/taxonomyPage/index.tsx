@@ -100,7 +100,7 @@ const TaxonomyPage: React.FC<{}> = () => {
             {
                 title: 'Details',
                 component: <>
-                    <DetailsPanelItem extraValueProps={{ copyable: true }} name='Uniprot ID' value={taxonomy.id.toString()} />
+                    <DetailsPanelItem extraValueProps={{ copyable: true }} name='Uniprot ID' value={taxonomy.id} />
                     <DetailsPanelItem name='Common Name' value={taxonomy.commonName} />
                     <DetailsPanelItem name='Scientific Name' value={taxonomy.scientificName} />
                     <DetailsPanelItem name='Mnemonic' value={taxonomy.mnemonic} />

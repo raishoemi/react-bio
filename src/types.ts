@@ -68,11 +68,7 @@ export class Protein implements Entity {
         public readonly name: string,
         public readonly reviewed: boolean,
         public readonly evidence: ProteinEvidence,
-        public readonly gene: {
-            primaryName: string,
-            alternativeNames: string[],
-            orfNames: string[]
-        },
+        public readonly geneName: string,
         public readonly taxonomy: {
             name: string,
             id: string
@@ -85,10 +81,11 @@ export class Protein implements Entity {
         }
     ) { }
 
-    public get geneName(): string {
-        if (this.gene.primaryName) return this.gene.primaryName;
-        if (this.gene.alternativeNames) return this.gene.alternativeNames[0];
-        if (this.gene.orfNames) return this.gene.orfNames[0];
-        return this.id.toString();
+    public get evidenceRating(): (1| 2 | 3 | 4| 5) {
+        if (this.evidence === ProteinEvidence.ProteinLevelEvidence) return 5;
+        if (this.evidence === ProteinEvidence.TranscriptLevelEvidence) return 4;
+        if (this.evidence === ProteinEvidence.InferredFromHomology) return 3;
+        if (this.evidence === ProteinEvidence.Predicted) return 2;
+        return 1;
     }
 }

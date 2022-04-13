@@ -23,7 +23,7 @@ export async function queryApi(query: string, endpoint: string, limit: number = 
 }
 
 export async function getOne(id: string, endpoint: string, columns: string[] = []): Promise<string> {
-    let requestUrl = `https://www.uniprot.org/taxonomy/?query=${id}&format=tab&sort=score`;
+    let requestUrl = `https://www.uniprot.org/${endpoint}/?query=${id}&format=tab&sort=score`;
     if (columns.length !== 0) {
         requestUrl += `&columns=${columns.join(',')}`
     }

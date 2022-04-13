@@ -14,7 +14,7 @@ const App: React.FunctionComponent = ({ }) => {
   return (
     <div className={classes.container}>
       <div className={classes.logo}>
-        <img className={classes.logoImage} src='https://p7.hiclipart.com/preview/451/428/959/ikea-logo-sign-brand-business-business.jpg' />
+        <img className={classes.logoImage} src='https://i.imgur.com/1SE3a2W.png' />
       </div>
       <div className={classes.page}>
         <SearchBar />
