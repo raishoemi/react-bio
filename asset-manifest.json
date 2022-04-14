@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/react-bio/static/css/main.68f741b3.css",
+    "main.js": "/react-bio/static/js/main.4b0c7cbe.js",
+    "static/js/787.550814a7.chunk.js": "/react-bio/static/js/787.550814a7.chunk.js",
+    "index.html": "/react-bio/index.html",
+    "main.68f741b3.css.map": "/react-bio/static/css/main.68f741b3.css.map",
+    "main.4b0c7cbe.js.map": "/react-bio/static/js/main.4b0c7cbe.js.map",
+    "787.550814a7.chunk.js.map": "/react-bio/static/js/787.550814a7.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.68f741b3.css",
+    "static/js/main.4b0c7cbe.js"
+  ]
+}
