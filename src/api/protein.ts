@@ -35,7 +35,7 @@ export async function getProtein(id: string): Promise<Protein> {
     return protein;
 }
 
-export async function getRandomProteinId(): Promise<number> {
+export async function getRandomProteinId(): Promise<string> {
     return getRandomId(PROTEIN_QUERY_ENDPOINT)
 }
 

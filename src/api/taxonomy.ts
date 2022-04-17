@@ -16,7 +16,7 @@ export async function getTaxonomy(id: string): Promise<Taxonomy> {
     return taxonomy;
 }
 
-export async function getRandomTaxonomyId(): Promise<number> {
+export async function getRandomTaxonomyId(): Promise<string> {
     return getRandomId(TAXONOMY_QUERY_ENDPOINT)
 }
 

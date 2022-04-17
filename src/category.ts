@@ -9,7 +9,7 @@ abstract class Category {
     ) { }
 
     public abstract getEntities(query: string, limit?: number, offset?: number): Promise<Entity[]>;
-    public abstract getRandomId(): Promise<number>;
+    public abstract getRandomId(): Promise<string>;
     public abstract getQueryResultSize(query: string): Promise<number>;
 }
 
@@ -22,7 +22,7 @@ class TaxonomyCategory extends Category {
         return queryTaxonomies(query, limit, offset);
     }
 
-    public getRandomId(): Promise<number> {
+    public getRandomId(): Promise<string> {
         return getRandomTaxonomyId();
     }
 
@@ -40,7 +40,7 @@ class ProteinCategory extends Category {
         return queryProteins(query, limit, offset);
     }
 
-    public getRandomId(): Promise<number> {
+    public getRandomId(): Promise<string> {
         return getRandomProteinId();
     }
 

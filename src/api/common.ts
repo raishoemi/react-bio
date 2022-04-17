@@ -34,7 +34,7 @@ export async function getOne(id: string, endpoint: string, columns: string[] = [
     return lines[1];
 }
 
-export async function getRandomId(endpoint: string): Promise<number> {
+export async function getRandomId(endpoint: string): Promise<string> {
     const response = await fetch(`https://www.uniprot.org/${endpoint}/?random=yes`);
-    return parseInt(response.url.split('/').slice(-1)[0]);
+    return response.url.split('/').slice(-1)[0];
 }
