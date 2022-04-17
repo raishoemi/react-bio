@@ -1,10 +1,11 @@
-import { Button, Select } from 'antd';
+import { Button, Select, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { categories, Category } from '../../category';
 import SearchBox from './searchBox';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Entity } from '../../types';
+import { LoadingOutlined } from '@ant-design/icons';
 
 const DEFAULT_CATEGORY_NAME = 'Taxonomy' // TODO: Could be retrieved dynamically somehow
 
@@ -12,6 +13,7 @@ const SearchBar: React.FC<{}> = () => {
     const classes = useStyles();
     const navigate = useNavigate();
     const [chosenCategory, setChosenCategory] = useState<string>(DEFAULT_CATEGORY_NAME);
+    const [loadingRandomItem, setLoadingRandomItem] = useState<boolean>(false);
     const location = useLocation();
 
     const onAutoCompleteQuery = (query: string): Promise<Entity[]> => {
@@ -28,7 +30,9 @@ const SearchBar: React.FC<{}> = () => {
     }, [location]);
 
     async function onRandomItem(): Promise<void> {
+        setLoadingRandomItem(true);
         const randomItemId = await categories[chosenCategory].getRandomId();
+        setLoadingRandomItem(false);
         navigateToItemPage(randomItemId.toString());
     }
 
@@ -55,6 +59,8 @@ const SearchBar: React.FC<{}> = () => {
                 onAutoCompleteQuery={onAutoCompleteQuery} onSelected={navigateToItemPage} />
             <div style={{ flex: 0.02 }}></div>
             <Button type='dashed' onClick={onRandomItem}>Random</Button>
+            <div style={{ flex: 0.02 }}></div>
+            <Spin style={{visibility: loadingRandomItem ? 'visible' : 'hidden'}} delay={100} indicator={<LoadingOutlined />} size={'large'} />
         </div>
     );
 };
