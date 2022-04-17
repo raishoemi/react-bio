@@ -3,7 +3,7 @@ import 'antd/dist/antd.css';
 import { createUseStyles } from 'react-jss';
 import { Button, Popover } from 'antd';
 import SearchResultsPage from './components/pages/searchResultsPage';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import TaxonomyPage from './components/pages/taxonomyPage';
 import SearchBar from './components/searchBar';
 import ProteinPage from './components/pages/proteinPage';
@@ -11,10 +11,12 @@ import ProteinPage from './components/pages/proteinPage';
 
 const App: React.FunctionComponent = ({ }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
+
   return (
     <div className={classes.container}>
       <div className={classes.logo}>
-        <img className={classes.logoImage} src='https://i.imgur.com/1SE3a2W.png' />
+        <img className={classes.logoImage} src='https://i.imgur.com/1SE3a2W.png' onClick={() => navigate('/')} />
       </div>
       <div className={classes.page}>
         <SearchBar />
@@ -47,10 +49,11 @@ const useStyles = createUseStyles({
     width: '10vw',
     height: '10vw',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   logoImage: {
-    width: '70%'
+    width: '70%',
+    cursor: 'pointer'
   },
   page: {
     width: '80vw',
