@@ -1,8 +1,8 @@
-import { Typography } from 'antd';
+import { Progress, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProtein } from '../../../api/protein';
-import { Protein } from '../../../types';
+import { Protein, ProteinEvidence } from '../../../types';
 import { ItemPage, LoadingItemPage } from '../itemPage';
 import DetailsPanelItem from '../itemPage/detailsPanelItem';
 
@@ -19,6 +19,29 @@ const ProteinPage: React.FC<{}> = () => {
         });
     }, [id]);
 
+    const proteinEvidenceProgress: { [evidence: string]: { color: string, percentage: number } } = {
+        [ProteinEvidence.ProteinLevelEvidence]: {
+            color: 'green',
+            percentage: 100
+        },
+        [ProteinEvidence.TranscriptLevelEvidence]: {
+            color: '#e1e100',
+            percentage: 75
+        },
+        [ProteinEvidence.InferredFromHomology]: {
+            color: 'orange',
+            percentage: 50
+        },
+        [ProteinEvidence.Predicted]: {
+            color: 'red',
+            percentage: 25
+        },
+        [ProteinEvidence.Uncertain]: {
+            color: 'gray',
+            percentage: 0
+        },
+    }
+
     if (!protein) return <LoadingItemPage />;
 
     // TOOD: Show reviewed with checked 
@@ -29,7 +52,16 @@ const ProteinPage: React.FC<{}> = () => {
                 component: <>
                     <DetailsPanelItem extraValueProps={{ copyable: true }} name='Uniprot ID' value={protein.id} />
                     <DetailsPanelItem name='Name' value={protein.name} />
-                    <DetailsPanelItem name='Evidence' value={protein.evidence} />
+                    <DetailsPanelItem name='Evidence' value={<Tooltip title={protein.evidence}>
+                        <Progress
+                            style={{ width: '10%' }}
+                            trailColor={'gray'}
+                            showInfo={false}
+                            percent={proteinEvidenceProgress[protein.evidence].percentage}
+                            strokeColor={proteinEvidenceProgress[protein.evidence].color}
+                            size={'small'}
+                        />
+                    </Tooltip>} />
                     <DetailsPanelItem name='Organism' isLink value={protein.taxonomy.name} extraValueProps={{ onClick: () => navigate(`/taxonomy/${protein.taxonomy.id}`) }} />
                     <DetailsPanelItem name='Gene' value={protein.geneName} />
                     <DetailsPanelItem name='Chromosome' value={protein.proteome.chromosome} />
