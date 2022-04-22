@@ -17,8 +17,7 @@ export async function queryApi(query: string, endpoint: string, limit: number = 
     const response = await fetch(requestUrl);
     const responseText = await response.text();
     let lines = responseText.split('\n');
-    lines.shift(); // First line is header
-    lines.pop(); // Last line is empty string
+    stripQueryResponseLines(lines)
     return lines;
 }
 
@@ -29,12 +28,19 @@ export async function getOne(id: string, endpoint: string, columns: string[] = [
     }
     const response = await fetch(requestUrl);
     const responseText = await response.text();
-    const lines = responseText.split('\n')
-    if (lines.length === 1) throw new NotFoundError();
-    return lines[1];
+    const lines = (responseText.split('\n'));
+    stripQueryResponseLines(lines)
+    const matchingsLines = lines.filter(line => line.split('\t')[0] === id)
+    if (matchingsLines.length !== 1) throw new NotFoundError();
+    return matchingsLines[0];
 }
 
 export async function getRandomId(endpoint: string): Promise<string> {
     const response = await fetch(`https://www.uniprot.org/${endpoint}/?random=yes`);
     return response.url.split('/').slice(-1)[0];
+}
+
+function stripQueryResponseLines(lines: string[]) {
+    lines.shift(); // First line is header
+    lines.pop(); // Last line is empty
 }
