@@ -1,8 +1,8 @@
 import { Progress, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getProtein } from '../../../api/protein';
-import { Protein, ProteinEvidence } from '../../../types';
+import { getProtein, getProteinExtraData } from '../../../api/protein';
+import { Protein, ProteinEvidence, ProteinExtraData } from '../../../types';
 import { ItemPage, LoadingItemPage } from '../itemPage';
 import DetailsPanelItem from '../itemPage/detailsPanelItem';
 
@@ -11,11 +11,15 @@ const ProteinPage: React.FC<{}> = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [protein, setProtein] = useState<Protein>();
+    const [proteinExtraData, setProteinExtraData] = useState<ProteinExtraData>();
 
     useEffect(() => {
         if (!id) return;
         getProtein(id).then(protein => {
             setProtein(protein);
+        });
+        getProteinExtraData(id).then(proteinExtraData => {
+            setProteinExtraData(proteinExtraData);
         });
     }, [id]);
 
@@ -67,6 +71,17 @@ const ProteinPage: React.FC<{}> = () => {
                     <DetailsPanelItem name='Chromosome' value={protein.proteome.chromosome} />
                 </>,
                 forceRender: true
+            },
+            {
+                title: 'Function',
+                component: proteinExtraData ?
+                    <Typography.Paragraph>
+                        {proteinExtraData.function}
+                    </Typography.Paragraph>
+                    :
+                    null,
+                forceRender: true,
+                failed: proteinExtraData?.function === null
             },
             {
                 title: `Sequence (${protein.sequence.length} aa)`,
