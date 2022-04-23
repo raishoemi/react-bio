@@ -60,8 +60,6 @@ export class Lineage {
     }
 }
 
-// https://www.uniprot.org/uniprot/?query=reviewed:yes+AND+organism:9606&format=tab
-
 export class Protein implements Entity {
     constructor(
         public readonly id: string,
@@ -80,12 +78,8 @@ export class Protein implements Entity {
             chromosome: string
         }
     ) { }
+}
 
-    public get evidenceRating(): (1| 2 | 3 | 4| 5) {
-        if (this.evidence === ProteinEvidence.ProteinLevelEvidence) return 5;
-        if (this.evidence === ProteinEvidence.TranscriptLevelEvidence) return 4;
-        if (this.evidence === ProteinEvidence.InferredFromHomology) return 3;
-        if (this.evidence === ProteinEvidence.Predicted) return 2;
-        return 1;
-    }
+export type ProteinExtraData = {
+    function: string | null;
 }

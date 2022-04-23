@@ -1,5 +1,5 @@
 import { NotFoundError } from "../errors";
-import { Protein, ProteinEvidence } from "../types";
+import { Protein, ProteinEvidence, ProteinExtraData } from "../types";
 import { getOne, getRandomId, getResultsAmount, queryApi } from "./common";
 
 const PROTEIN_QUERY_ENDPOINT = 'uniprot';
@@ -41,6 +41,22 @@ export async function getRandomProteinId(): Promise<string> {
 
 export async function getProteinResultsAmount(query: string): Promise<number> {
     return getResultsAmount(query, PROTEIN_QUERY_ENDPOINT);
+}
+
+/**
+ * Returns null for any missing property
+ */
+export async function getProteinExtraData(id: string): Promise<ProteinExtraData> {
+    const response = await fetch(`https://www.ebi.ac.uk/proteins/api/proteins/${id}`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+    if (!response.ok) throw new NotFoundError();
+    const json = await response.json();
+    return {
+        function: json.comments.filter((c: any) => c.type === 'FUNCTION').at(0)?.text.at(0)?.value || null,
+    }
 }
 
 function parseProteinQueryResponse(line: string): Protein {
