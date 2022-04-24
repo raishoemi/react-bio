@@ -54,9 +54,18 @@ export async function getProteinExtraData(id: string): Promise<ProteinExtraData>
     });
     if (!response.ok) throw new NotFoundError();
     const json = await response.json();
+
+
     return {
-        function: json.comments.filter((c: any) => c.type === 'FUNCTION').at(0)?.text.at(0)?.value || null,
+        function: getCommentbyType(json.comments, 'FUNCTION'),
+        tissueSpecifity: getCommentbyType(json.comments, 'TISSUE_SPECIFICITY'),
+        developmentalStage: getCommentbyType(json.comments, 'DEVELOPMENTAL_STAGE'),
+        induction: getCommentbyType(json.comments, 'INDUCTION')
     }
+}
+
+function getCommentbyType(comments: any, type: string): string | null {
+    return comments.filter((c: any) => c.type === type).at(0)?.text.at(0)?.value || null
 }
 
 function parseProteinQueryResponse(line: string): Protein {

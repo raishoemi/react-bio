@@ -89,7 +89,40 @@ const ProteinPage: React.FC<{}> = () => {
                     {protein.sequence}
                 </Typography.Paragraph>,
                 forceRender: true
-            }
+            },
+            {
+                title: 'Tissue Specificity',
+                component: proteinExtraData ?
+                    <Typography.Paragraph>
+                        {proteinExtraData.tissueSpecifity}
+                    </Typography.Paragraph>
+                    :
+                    null,
+                forceRender: true,
+                failed: proteinExtraData?.tissueSpecifity === null
+            },
+            {
+                title: 'Developmental Stage',
+                component: proteinExtraData ?
+                    <Typography.Paragraph>
+                        {proteinExtraData.developmentalStage}
+                    </Typography.Paragraph>
+                    :
+                    null,
+                forceRender: true,
+                failed: proteinExtraData?.developmentalStage === null
+            },
+            {
+                title: 'Induction',
+                component: proteinExtraData ?
+                    <Typography.Paragraph>
+                        {proteinExtraData.induction}
+                    </Typography.Paragraph>
+                    :
+                    null,
+                forceRender: true,
+                failed: proteinExtraData?.induction === null
+            },
         ]} />
     );
 }

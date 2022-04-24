@@ -82,4 +82,7 @@ export class Protein implements Entity {
 
 export type ProteinExtraData = {
     function: string | null;
+    tissueSpecifity: string | null;
+    developmentalStage: string | null;
+    induction: string | null;
 }
