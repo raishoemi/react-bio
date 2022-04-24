@@ -11,7 +11,7 @@ type Panel = {
 }
 
 type ItemPageProps = {
-    title: string;
+    title: React.ReactNode;
     panels: Panel[]
 }
 
@@ -24,8 +24,12 @@ const LoadingItemPage: React.FC<{}> = () => {
 const ItemPage: React.FC<ItemPageProps> = (props) => {
     const classes = useStyles();
 
+    const withFailedTooltip = (element: React.ReactNode): React.ReactNode => (
+        <Tooltip title='Data for this section is missing'>{element}</Tooltip>
+    )
+
     const renderPanelIcon = (isComponentNull: boolean, isFailed: boolean) => {
-        if (isFailed) return <Tooltip title='Data for this section is missing'><StopOutlined /></Tooltip>;
+        if (isFailed) return withFailedTooltip(<StopOutlined />);
         if (isComponentNull) return <Spin delay={200} indicator={<LoadingOutlined />} size={'small'} />;
         return <></>;
     }
@@ -47,7 +51,7 @@ const ItemPage: React.FC<ItemPageProps> = (props) => {
                     collapsible={isPanelDisabled(panel) ? 'disabled' : 'header'}
                     showArrow={!isPanelDisabled(panel)}
                     forceRender={panel.forceRender}
-                    header={panel.title}
+                    header={panel.failed ? withFailedTooltip(panel.title) : panel.title}
                     key={(index + 1).toString()}
                 >
                     {panel.component}
