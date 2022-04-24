@@ -32,10 +32,16 @@ const ItemPage: React.FC<ItemPageProps> = (props) => {
 
     const isPanelDisabled = (panel: Panel) => panel.failed || panel.component === null;
 
+    const sortPanelsByFailed = (panel1: Panel, panel2: Panel): number => {
+        if (panel1.failed === panel2.failed) return 0;
+        if (panel1.failed) return 1;
+        return -1;
+    }
+
     return <div className={classes.pageContainer}>
         <Typography.Title level={3}>{props.title}</Typography.Title>
         <Collapse defaultActiveKey={['1']} style={{ width: '80%' }}>
-            {props.panels.map((panel, index) => (
+            {props.panels.sort(sortPanelsByFailed).map((panel, index) => (
                 <Collapse.Panel
                     extra={renderPanelIcon(panel.component === null, panel.failed === true)}
                     collapsible={isPanelDisabled(panel) ? 'disabled' : 'header'}
