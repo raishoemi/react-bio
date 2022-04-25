@@ -5,7 +5,7 @@ import { Button, Popover } from 'antd';
 import SearchResultsPage from './components/pages/searchResultsPage';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import TaxonomyPage from './components/pages/taxonomyPage';
-import SearchBar from './components/searchBar';
+import { SearchBar, withSearchBar } from './components/searchBar';
 import ProteinPage from './components/pages/proteinPage';
 
 
@@ -19,11 +19,11 @@ const App: React.FunctionComponent = ({ }) => {
         <img className={classes.logoImage} src='https://i.imgur.com/1SE3a2W.png' onClick={() => navigate('/')} />
       </div>
       <div className={classes.page}>
-        <SearchBar />
         <Routes>
-          <Route path='search' element={<SearchResultsPage />} />
-          <Route path='taxonomy/:id' element={<TaxonomyPage />} />
-          <Route path='protein/:id' element={<ProteinPage />} />
+          <Route path='/' element={<SearchBar />} />
+          <Route path='search' element={withSearchBar(SearchResultsPage)} />
+          <Route path='taxonomy/:id' element={withSearchBar(TaxonomyPage)} />
+          <Route path='protein/:id' element={withSearchBar(ProteinPage)} />
         </Routes>
       </div>
       <div className={classes.uniprotDisclaimerContainer} style={{ 'backgroundImage': 'https://www.uniprot.org/images/UniProt_Headerimage.png' }}>

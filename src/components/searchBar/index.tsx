@@ -1,7 +1,7 @@
 import { Button, Select, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { categories, Category } from '../../category';
+import { categories } from '../../category';
 import SearchBox from './searchBox';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Entity } from '../../types';
@@ -60,7 +60,7 @@ const SearchBar: React.FC<{}> = () => {
             <div style={{ flex: 0.02 }}></div>
             <Button type='dashed' onClick={onRandomItem}>Random</Button>
             <div style={{ flex: 0.02 }}></div>
-            <Spin style={{visibility: loadingRandomItem ? 'visible' : 'hidden'}} delay={100} indicator={<LoadingOutlined />} size={'large'} />
+            <Spin style={{ visibility: loadingRandomItem ? 'visible' : 'hidden' }} delay={100} indicator={<LoadingOutlined />} size={'large'} />
         </div>
     );
 };
@@ -74,4 +74,11 @@ const useStyles = createUseStyles({
     }
 });
 
-export default SearchBar;
+const withSearchBar = (Component: React.FC<{}>) => (
+    <>
+        <SearchBar />
+        <Component />
+    </>
+)
+
+export { SearchBar, withSearchBar };
