@@ -49,7 +49,7 @@ const ItemPage: React.FC<ItemPageProps> = (props) => {
                 <Collapse.Panel
                     extra={renderPanelIcon(panel.component === null, panel.failed === true)}
                     collapsible={isPanelDisabled(panel) ? 'disabled' : 'header'}
-                    showArrow={!isPanelDisabled(panel)}
+                    showArrow={!panel.failed}
                     forceRender={panel.forceRender}
                     header={panel.failed ? withFailedTooltip(panel.title) : panel.title}
                     key={(index + 1).toString()}
